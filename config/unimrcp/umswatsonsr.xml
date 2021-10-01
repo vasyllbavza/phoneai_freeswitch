@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<umswatsonsr license-file="umswatsonsr_*.lic" credentials-file="watsonsr.credentials">
+
+   <license-server
+      enable="false"
+      server-address="127.0.0.1"
+      certificate-file="unilic_client_*.crt"
+      ca-file="unilic_ca.crt"
+   />
+
+   <ws-streaming-recognition
+      language="en-US"
+      language-customization-id=""
+      acoustic-customization-id=""
+      base-model-version=""
+      grammar-name=""
+      single-utterance="false"
+      max-alternatives="1"
+      alternatives-below-threshold="false"
+      confidence-format="auto"
+      smart-formatting="false"
+      word-confidence="false"
+      timestamps="false"
+      speaker-labels="false"
+      redaction="false"
+      processing-metrics="false"
+      audio-metrics="false"
+      end-of-phrase-silence-time="1"
+      start-of-input="service-originated"
+      skip-unsupported-grammars="true"
+      transcription-grammar="transcribe"
+      auth-validation-period="0"
+      inter-result-timeout="2000"
+   />
+
+   <speech-contexts>
+      <speech-context id="boolean" language="en-US" speech-complete="true" scope="strict" enable="false">
+         <phrase tag="true">yes</phrase>
+         <phrase tag="true">sure</phrase>
+         <phrase tag="true">correct</phrase>
+         <phrase tag="false">no</phrase>
+         <phrase tag="false">not sure</phrase>
+         <phrase tag="false">incorrect</phrase>
+      </speech-context>
+   </speech-contexts>
+
+   <speech-dtmf-input-detector
+      vad-mode="2"
+      speech-start-timeout="300"
+      speech-complete-timeout="1000"
+      speech-incomplete-timeout="15000"
+      noinput-timeout="5000"
+      input-timeout="30000"
+      dtmf-interdigit-timeout="5000"
+      dtmf-term-timeout="10000"
+      dtmf-term-char=""
+      speech-leading-silence="300"
+      speech-trailing-silence="300"
+      speech-output-period="200"
+   />
+
+   <utterance-manager
+      save-waveforms="false"
+      purge-existing="false"
+      max-file-age="60"
+      max-file-count="100"
+      waveform-base-uri="http://localhost/utterances/"
+      waveform-folder=""
+      use-logging-tag="false"
+   />
+
+   <rdr-manager
+      save-records="true"
+      purge-existing="false"
+      max-file-age="0"
+      max-file-count="100"
+      record-folder="/opt/unimrcp/record/"
+      file-prefix="rdr_"
+      use-logging-tag="false"
+   />
+
+   <monitoring-agent refresh-period="60">
+      <usage-change-handler>
+         <log-usage enable="true" priority="NOTICE"/>
+         <update-usage enable="false" status-file="umswatsonsr-usage.status"/>
+         <dump-channels enable="false" status-file="umswatsonsr-channels.status"/>
+      </usage-change-handler>
+
+      <usage-refresh-handler>
+         <log-usage enable="false" priority="NOTICE"/>
+         <update-usage enable="false" status-file="umswatsonsr-usage.status"/>
+         <dump-channels enable="false" status-file="umswatsonsr-channels.status"/>
+      </usage-refresh-handler>
+   </monitoring-agent>
+
+</umswatsonsr>
+
