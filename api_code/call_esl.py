@@ -140,7 +140,7 @@ try:
 
                         if event_action == "call_keys":
                             try:
-                                call = CallLog.objects.filter(id=call_id)
+                                call = CallLog.objects.get(pk=call_id)
                                 callkey = CallKey(call=call,keys=event_keys)
                                 callkey.save()
                             except:
@@ -148,7 +148,7 @@ try:
 
                         if event_action == "call_started":
                             try:
-                                call = CallLog.objects.filter(id=call_id)
+                                call = CallLog.objects.get(pk=call_id)
                                 call.status = CallStatus.CALLING
                                 call.save()
                             except:
