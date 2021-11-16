@@ -44,6 +44,7 @@ sound = "/usr/share/freeswitch/sounds/silence_10m.wav";
 results = "";
 confidenceRef = 0.01;
 
+phoneai_call_id = session:getVariable("phoneai_call_id");
 uuid = session:getVariable("uuid");
 destination_number = session:getVariable("destination_number");
 if destination_number == nil then destination_number = ""; end
@@ -267,6 +268,8 @@ function onInput(s, type, obj)
                local evtdata = {};
                evtdata["action"] = "call_keys";
                evtdata['keys'] = new_key;
+               evtdata['call_id'] = phoneai_call_id;
+               evtdata['call_uuid'] = uuid;
                evtdata["param1"] = "phoneAI";
                evtdata["param2"] = destination_number;
                evtdata["param3"] = key_collected;
@@ -302,6 +305,8 @@ if (session:ready()) then
                 local evtdata = {};
                 evtdata["action"] = "silence_detected";
                 evtdata['keys'] = key_collected;
+                evtdata['call_id'] = phoneai_call_id;
+                evtdata['call_uuid'] = uuid;
                 evtdata["param1"] = "phoneAI";
                 evtdata["param2"] = destination_number;
                 evtdata["param3"] = key_collected;

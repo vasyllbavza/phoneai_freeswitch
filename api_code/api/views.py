@@ -74,9 +74,10 @@ class MakeCallView(APIView):
         call = CallLog(number=dial_number,status=CallStatus.PENDING)
         call.uuid = call_uuid
         call.save()
+        call_id = call.id
 
         cmd = 'bgapi'
-        callParams = "{ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (caller_id,call_uuid)
+        callParams = "{phoneai_call_id="..call_id..",ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (caller_id,call_uuid)
         args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai.lua)" %(callParams,dial_number)
         print( "%s %s" %(cmd,args) )
         result = freeswitch_execute(cmd,args)
