@@ -77,8 +77,8 @@ class MakeCallView(APIView):
         call_id = call.id
 
         cmd = 'bgapi'
-        callParams = "{phoneai_call_id=%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (caller_id,call_uuid)
-        args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai.lua)" %(str(call_id),callParams,dial_number)
+        callParams = "{phoneai_call_id=%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (str(call_id),caller_id,call_uuid)
+        args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai.lua)" %(callParams,dial_number)
         print( "%s %s" %(cmd,args) )
         result = freeswitch_execute(cmd,args)
         if result['status'] < 1:
