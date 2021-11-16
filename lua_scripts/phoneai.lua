@@ -49,8 +49,17 @@ uuid = session:getVariable("uuid");
 destination_number = session:getVariable("destination_number");
 if destination_number == nil then destination_number = ""; end
 
+local evtdata = {};
+evtdata["action"] = "call_started";
+evtdata['call_id'] = phoneai_call_id;
+evtdata['call_uuid'] = uuid;
+mydtbd_send_event(evtdata);
+
 speaking_start = 0;
 speech_found = "";
+
+key_level  = 0;
+key_parent = 0;
 
 --ASR Stuff
 -- Used in parse_xml
@@ -274,6 +283,9 @@ function onInput(s, type, obj)
                evtdata["param2"] = destination_number;
                evtdata["param3"] = key_collected;
                evtdata["param4"] = speech_found;
+               evtdata["key_level"] = key_level;
+               evtdata["key_parent"] = key_parent;
+
                mydtbd_send_event(evtdata);
             --    send_dtmf(speech);
             end
@@ -311,6 +323,8 @@ if (session:ready()) then
                 evtdata["param2"] = destination_number;
                 evtdata["param3"] = key_collected;
                 evtdata["param4"] = speech_found;
+                evtdata["key_level"] = key_level;
+                evtdata["key_parent"] = key_parent;
                 mydtbd_send_event(evtdata);
             end
         end
