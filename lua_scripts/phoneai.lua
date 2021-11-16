@@ -259,11 +259,14 @@ function onInput(s, type, obj)
                speech_found = speech_found .. " "..speech;
                freeswitch.consoleLog("ERR", "\n" .. speech .. "\n");               
                freeswitch.consoleLog("ERR", "\n" .. speech_found .. "\n");
-               key_collected = key_collected..key_check(speech);
+               new_key = key_check(speech);
+               key_collected = key_collected..new_key;
                freeswitch.consoleLog("ERR", "\n" .. key_collected .. "\n");
                speaking_start = os.time();
                upload_webhook(speech_found,key_collected);
                local evtdata = {};
+               evtdata["action"] = "call_keys";
+               evtdata['keys'] = new_key;
                evtdata["param1"] = "phoneAI";
                evtdata["param2"] = destination_number;
                evtdata["param3"] = key_collected;
@@ -295,8 +298,15 @@ if (session:ready()) then
         if speaking_start > 0 then
             wait_time = os.time() - speaking_start;
             freeswitch.consoleLog("ERR", "wait_time = " .. wait_time .."\n");
-            if wait_time >9 then
-
+            if wait_time > 9 then
+                local evtdata = {};
+                evtdata["action"] = "silence_detected";
+                evtdata['keys'] = key_collected;
+                evtdata["param1"] = "phoneAI";
+                evtdata["param2"] = destination_number;
+                evtdata["param3"] = key_collected;
+                evtdata["param4"] = speech_found;
+                mydtbd_send_event(evtdata);
             end
         end
     end
