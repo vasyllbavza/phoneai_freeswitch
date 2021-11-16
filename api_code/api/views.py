@@ -1,13 +1,21 @@
-from django.shortcuts import render
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+import uuid
 
-# Create your views here.
-from rest_framework.views import APIView
+from django.shortcuts import render
+from rest_framework.authentication import (
+    SessionAuthentication,
+    BasicAuthentication,
+    TokenAuthentication
+)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from api.models import (
+    CallLog,
+    CallStatus,
+)
 
 from phoneai_api import settings
-import uuid
 
 try:
     from freeswitchESL import ESL
@@ -25,34 +33,32 @@ class HelloView(APIView):
 
 def freeswitch_execute(cmd,params):
 
-        result = {}
-        if not ESL:
-            result['status'] = -1
-            result['message'] = "ESL not loaded"
+    result = {}
+    if not ESL:
+        result['status'] = -1
+        result['message'] = "ESL not loaded"
+        return result
+    else:
+        # reload(ESL)
+        c = ESL.ESLconnection(settings.ESL_HOSTNAME, settings.ESL_PORT, settings.ESL_SECRET)
+        if c.connected() != 1:
+            result['status'] = 0
+            result['message'] = "Switch Connection error"
             return result
-        else:
+        ev = c.api(str(cmd),str(params))
 
-            # reload(ESL)
-            c = ESL.ESLconnection(settings.ESL_HOSTNAME, settings.ESL_PORT, settings.ESL_SECRET)
-            if c.connected() != 1:
-                result['status'] = 0
-                result['message'] = "Switch Connection error"
-                return result
-            ev = c.api(str(cmd),str(params))
+        c.disconnect()
+        fs_result = ''
+        if ev:
+            fs_result = ev.serialize()
+            res = fs_result.split('\n\n',1)
+            if res[1]:
+                fs_result = res[1]
 
-            c.disconnect()
-            fs_result = ''
-            if ev:
-                fs_result = ev.serialize()
-                res = fs_result.split('\n\n',1)
-                if res[1]:
-                    fs_result = res[1]
-
-            result['status'] = 1
-            result['message'] = ""
-            result['fs_output'] = fs_result
-            return result
-
+        result['status'] = 1
+        result['message'] = ""
+        result['fs_output'] = fs_result
+        return result
 
 class MakeCallView(APIView):
 
@@ -64,6 +70,10 @@ class MakeCallView(APIView):
         caller_id = request.query_params.get('caller_id','14582037530')
 
         call_uuid = str(uuid.uuid4())
+
+        call = CallLog(number=dial_number,status=CallStatus.PENDING)
+        call.uuid = call_uuid
+        call.save()
 
         cmd = 'bgapi'
         callParams = "{ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (caller_id,call_uuid)
