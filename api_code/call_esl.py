@@ -17,6 +17,7 @@ from django.conf import settings
 from api.models import (
     CallLog,
     CallKey,
+    CallStatus,
 )
 
 try:
