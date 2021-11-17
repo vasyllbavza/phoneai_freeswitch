@@ -60,6 +60,8 @@ speech_found = "";
 
 key_level  = 0;
 key_parent = 0;
+session:setVariable("key_level", key_level);
+session:setVariable("key_parent", key_parent);
 
 --ASR Stuff
 -- Used in parse_xml
@@ -313,7 +315,7 @@ if (session:ready()) then
         if speaking_start > 0 then
             wait_time = os.time() - speaking_start;
             freeswitch.consoleLog("ERR", "wait_time = " .. wait_time .."\n");
-            if wait_time > 9 then
+            if wait_time > 5 then
                 local evtdata = {};
                 evtdata["action"] = "silence_detected";
                 evtdata['keys'] = key_collected;
@@ -323,9 +325,10 @@ if (session:ready()) then
                 evtdata["param2"] = destination_number;
                 evtdata["param3"] = key_collected;
                 evtdata["param4"] = speech_found;
-                evtdata["key_level"] = key_level;
-                evtdata["key_parent"] = key_parent;
+                evtdata["key_level"] = session:getVariable("key_level");
+                evtdata["key_parent"] = session:getVariable("key_parent");
                 mydtbd_send_event(evtdata);
+                wait_time = 0;
             end
         end
     end
