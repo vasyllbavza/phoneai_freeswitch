@@ -189,12 +189,20 @@ try:
                         if event_action == "call_started":
                             try:
                                 call = CallLog.objects.get(pk=call_id)
-                                call.status = CallStatus.CALLING
+                                call.status = CallStatus.ANSWERED
                                 call.save()
                                 callkeys = CallKey.objects.filter(call=call)
                                 if callkeys:
                                     for k in callkeys:
                                         k.delete()
+                            except:
+                                logger.error("CallLog save error!!")
+
+                        if event_action == "call_ended":
+                            try:
+                                call = CallLog.objects.get(pk=call_id)
+                                call.status = CallStatus.PROCESSED
+                                call.save()
                             except:
                                 logger.error("CallLog save error!!")
 

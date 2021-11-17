@@ -93,6 +93,8 @@ class MakeCallView(APIView):
         content['message'] = result['message']
         content['fs_output'] = result['fs_output']
         # content['args'] = args
+        call.status = CallStatus.CALLING
+        call.save()
 
         return Response(content)
 

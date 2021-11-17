@@ -330,6 +330,7 @@ if (session:ready()) then
                 mydtbd_send_event(evtdata);
                 wait_time = 0;
                 speaking_start = 0;
+                speech_found = "";
             end
         end
     end
@@ -340,5 +341,10 @@ if (session:ready()) then
             freeswitch.consoleLog("INFO", speechStr .."\n")
     end
 
+    local evtdata = {};
+    evtdata["action"] = "call_ended";
+    evtdata['call_id'] = phoneai_call_id;
+    evtdata['call_uuid'] = uuid;
+    mydtbd_send_event(evtdata);
 
 end
