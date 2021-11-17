@@ -329,6 +329,7 @@ if (session:ready()) then
                 evtdata["key_parent"] = session:getVariable("key_parent");
                 mydtbd_send_event(evtdata);
                 wait_time = 0;
+                speaking_start = 0;
             end
         end
     end
