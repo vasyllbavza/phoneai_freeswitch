@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404,redirect
 from api.models import (
     CallLog,
     CallKey,
+    CallStatus,
 )
 from api.views import freeswitch_execute
 
@@ -25,10 +26,12 @@ class CallLogAdmin(admin.ModelAdmin):
             print(result)
 
     def hangup_link(self, obj):
-        return format_html(
-            '<a class="button" href="{}">Hangup</a>&nbsp;',
-            reverse('admin:hangup-call', args=[obj.pk]),
-        )
+        if obj.status == CallStatus.CALLING or obj.status == CallStatus.ANSWERED:
+            return format_html(
+                '<a class="button" href="{}">Hangup</a>&nbsp;',
+                reverse('admin:hangup-call', args=[obj.pk]),
+            )
+        return ""
 
     hangup_link.short_description = 'Hangup Call'
     hangup_link.allow_tags = True
