@@ -75,6 +75,35 @@ def get_header(event,header_name):
     except:
         return ""
 
+def fs_send_dtmf(conn, uuid, dtmf):
+    cmd = 'bgapi'
+    args = f"uuid_send_dtmf {uuid} {dtmf}"
+    ev = conn.api(str(cmd),str(args))
+    fs_result = ''
+    if ev:
+        fs_result = ev.serialize()
+        # log_info(fs_result)
+        res = fs_result.split('\n\n',1)
+        if res[1]:
+            fs_result = res[1]
+            log_info(fs_result)
+            return True
+    return False
+
+def fs_set_var(conn, uuid, var, val):
+    cmd = 'bgapi'
+    args = f"uuid_setvar {uuid} {var} {val}"
+    ev = conn.api(str(cmd),str(args))
+    fs_result = ''
+    if ev:
+        fs_result = ev.serialize()
+        # log_info(fs_result)
+        res = fs_result.split('\n\n',1)
+        if res[1]:
+            fs_result = res[1]
+            log_info(fs_result)
+            return True
+    return False
 
 con = ESL.ESLconnection(settings.ESL_HOSTNAME, settings.ESL_PORT, settings.ESL_SECRET)
 print("[x] Starting..")
@@ -126,7 +155,7 @@ try:
 
                 if event_name == "CUSTOM":
                     
-                    print(e.serialize())
+                    # print(e.serialize())
 
                     sub_class = get_header(e,"Event-Subclass")
 
@@ -137,13 +166,23 @@ try:
                         event_keys = get_header(e,"keys")
                         call_uuid = get_header(e,"call_uuid")
                         call_id = get_header(e,"call_id")
-                        logger.info(f"{event_action} {call_id}")
-
+                        log_info(f"{event_action} {call_id}")
+                        # call_id = 1
                         if event_action == "call_keys":
                             try:
                                 call = CallLog.objects.get(pk=call_id)
-                                callkey = CallKey(call=call,keys=event_keys)
-                                callkey.save()
+                                if event_keys:
+                                    kk = event_keys.split(",")
+                                    if not kk:
+                                        continue
+                                    for k in kk:
+                                        if k:
+                                            try:
+                                                callkey = CallKey(call=call,keys=k)
+                                                callkey.save()
+                                                log_info(f"{callkey.id} key : {k}")
+                                            except:
+                                                pass
                             except:
                                 logger.error("callkey save error!!")
 
@@ -152,10 +191,28 @@ try:
                                 call = CallLog.objects.get(pk=call_id)
                                 call.status = CallStatus.CALLING
                                 call.save()
+                                callkeys = CallKey.objects.filter(call=call)
+                                if callkeys:
+                                    for k in callkeys:
+                                        k.delete()
                             except:
                                 logger.error("CallLog save error!!")
 
                         if event_action == "silence_detected":
+                            print(e.serialize())
+                            key_parent = get_header(e, "key_parent")
+                            key_level = get_header(e, "key_level")
+                            call_keys = get_header(e, "param3")
+                            log_info("silence_detected")
+                            ckeys = CallKey.objects.filter(call_id=call_id,processed=0,level=key_level).order_by('id')
+                            if len(ckeys) > 0:
+                                ckey = ckeys[0]
+                                log_info( f"sending DTMF [{ckey.keys}] to {call_id}, {call_uuid}")
+                                ckey.processed=1
+                                ckey.save()
+                                fs_send_dtmf(con, call_uuid, ckey.keys)
+                                fs_set_var(con, call_uuid,"key_level", int(key_level)+1)
+                                fs_set_var(con, call_uuid,"key_parent", ckey.id)
                             pass
             else:
                 if idle_count < 120:
