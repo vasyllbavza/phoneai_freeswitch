@@ -20,7 +20,7 @@ class CallLog(models.Model):
 
 
     def __str__(self):
-        return f"{self.number} [{self.status}]"
+        return f"{self.number} [{self.id}]"
 
     class Meta:
         db_table = 'call_logs'
