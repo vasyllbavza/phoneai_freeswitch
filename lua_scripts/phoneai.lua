@@ -62,30 +62,14 @@ function key_check(speech)
     return key_collected
 end
 
-function send_dtmf(number)
-
-    local words = {}
-    for w in number:gmatch("%w+") do
-        table.insert(words, w) 
-        freeswitch.consoleLog("ERR", w)
-        for k,v in pairs(results_map) do
-            if k == w then
-                cmd = "uuid_send_dtmf "..uuid.." "..v;
-                api:executeString(cmd);
-                break;
-            end
-        end
-    end
-
-end
-function send_dtmf_single(digit)
-    cmd = "uuid_send_dtmf "..uuid.." "..digit;
-    api:executeString(cmd);
-end
-
--- This is the input callback used by dtmf or any other events on this session such as ASR.
+-- This is the input callback used by dtmf or any other events
+-- on this session such as ASR.
+-- we are using detect_speech to capture watson transcription data
+-- and this information pass to use through this callback
+--
 function onInput(s, type, obj)
     freeswitch.consoleLog("info", "Callback with type " .. type .. "\n");
+
     if (type == "dtmf") then
         freeswitch.consoleLog("info", "DTMF Digit: " .. obj.digit .. "\n");
         if (dtmf_input ~= nil) then
@@ -95,28 +79,25 @@ function onInput(s, type, obj)
             dtmf_input = obj.digit;
               return "break";
         end
-
         if (#dtmf_input == tonumber(ivr_menu_digit_len)) then
             return "break";
         end
+
     else if (type == "event") then
         local event = obj:getHeader("Speech-Type");
+
         if (event == "begin-speaking") then
             freeswitch.consoleLog("info", "\n" .. obj:serialize() .. "\n");
-            -- Return break on begin-speaking events to stop playback of the fire or tts.
-            --return "break";
             speaking_start = os.time();
             freeswitch.consoleLog("ERR", "\nspeaking_start = " .. speaking_start .. "\n");
         end
+
         if (event == "detected-speech") then
             freeswitch.consoleLog("debug", "\n" .. obj:serialize() .. "\n");
             if (obj:getBody()) then
-               -- Pause speech detection (this is on auto but pausing it just in case)
                session:execute("detect_speech", "resume");
                -- Parse the results from the event into the results table for later use.
                local xmlstr = obj:getBody();
-            --    results = getResults(xmlstr);
-            --    speech = parse_xmlstr(xmlstr);
                speech = parse_watson_xmlstr(xmlstr);
                speech_found = speech_found .. " "..speech;
                freeswitch.consoleLog("ERR", "\n" .. speech .. "\n");               
@@ -137,17 +118,16 @@ function onInput(s, type, obj)
                evtdata["param4"] = speech_found;
                evtdata["key_level"] = key_level;
                evtdata["key_parent"] = key_parent;
-
+               --initial event trigger for event handler [call_esl.py]
                mydtbd_send_event(evtdata);
-            --    send_dtmf(speech);
             end
-            -- return "break";
         end
     end
     end
 end
 
-
+-- call answer and wait for watson to send capture data
+--
 if (session:ready()) then
     session:answer();
     
@@ -155,11 +135,11 @@ if (session:ready()) then
     call_start_epoch = os.time();
 
     session:setInputCallback("onInput");
-    -- Sleep a little bit to give media time to be fully up.
     session:sleep(200);
     -- session:execute("detect_speech", "pocketsphinx pai_number undefined");
     session:execute("detect_speech", "unimrcp:watson {start-input-timers=false}builtin:speech/transcribe undefined");
     -- session:streamFile(sound);
+
     while session:ready() do
         session:sleep(1000);
         if speaking_start > 0 then
@@ -177,6 +157,8 @@ if (session:ready()) then
                 evtdata["param4"] = speech_found;
                 evtdata["key_level"] = session:getVariable("key_level");
                 evtdata["key_parent"] = session:getVariable("key_parent");
+                -- send silence detected event to [call_esl.py]
+                -- which will initiate dtmf witH ESL interface
                 mydtbd_send_event(evtdata);
                 wait_time = 0;
                 speaking_start = 0;

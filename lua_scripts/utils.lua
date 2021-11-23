@@ -77,6 +77,27 @@ end
 -- depreciated code
 --
 
+-- function send_dtmf_single(digit)
+--     cmd = "uuid_send_dtmf "..uuid.." "..digit;
+--     api:executeString(cmd);
+-- end
+
+-- function send_dtmf(number)
+
+--     local words = {}
+--     for w in number:gmatch("%w+") do
+--         table.insert(words, w)
+--         freeswitch.consoleLog("ERR", w)
+--         for k,v in pairs(results_map) do
+--             if k == w then
+--                 cmd = "uuid_send_dtmf "..uuid.." "..v;
+--                 api:executeString(cmd);
+--                 break;
+--             end
+--         end
+--     end
+
+-- end
 
 -- Used to parse the XML results.
 -- function getResults(s) 
