@@ -1,3 +1,8 @@
+--[[
+    This function will trigger FreeSWITCH Events.
+    - call_esl.py file will listen to this events and process
+    - with mod_amqp, we can send this information to amqp queue
+]]
 function mydtbd_send_event(mc_params)
 
     local cur_epoch = os.time();
