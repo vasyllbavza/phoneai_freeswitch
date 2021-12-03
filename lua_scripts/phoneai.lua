@@ -16,6 +16,7 @@ confidenceRef = 0.01;
 
 --collect parameter that passed from api request
 phoneai_call_id = session:getVariable("phoneai_call_id");
+is_new_call = session:getVariable("is_new_call");
 uuid = session:getVariable("uuid");
 destination_number = session:getVariable("destination_number");
 if destination_number == nil then destination_number = ""; end
@@ -25,6 +26,8 @@ local evtdata = {};
 evtdata["action"] = "call_started";
 evtdata['call_id'] = phoneai_call_id;
 evtdata['call_uuid'] = uuid;
+evtdata['is_new_call'] = is_new_call;
+
 mydtbd_send_event(evtdata);
 
 speaking_start = 0;
@@ -118,6 +121,7 @@ function onInput(s, type, obj)
                evtdata["param4"] = speech_found;
                evtdata["key_level"] = key_level;
                evtdata["key_parent"] = key_parent;
+               evtdata['is_new_call'] = is_new_call;
                --initial event trigger for event handler [call_esl.py]
                mydtbd_send_event(evtdata);
             end
@@ -157,6 +161,7 @@ if (session:ready()) then
                 evtdata["param4"] = speech_found;
                 evtdata["key_level"] = session:getVariable("key_level");
                 evtdata["key_parent"] = session:getVariable("key_parent");
+                evtdata['is_new_call'] = is_new_call;
                 -- send silence detected event to [call_esl.py]
                 -- which will initiate dtmf witH ESL interface
                 mydtbd_send_event(evtdata);

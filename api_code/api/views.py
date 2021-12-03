@@ -68,16 +68,31 @@ class MakeCallView(APIView):
 
         dial_number = request.query_params.get('number','')
         caller_id = request.query_params.get('caller_id','14582037530')
+        is_new_call = request.query_params.get('new','1')
 
         call_uuid = str(uuid.uuid4())
+        if is_new_call == "1":
+            call = CallLog(number=dial_number,status=CallStatus.PENDING)
+            call.uuid = call_uuid
+            call.save()
+            call_id = call.id
+        else:
+            call = CallLog.objects.filter(number=dial_number).order_by('-id').first()
+            if call:
+                call = CallLog.objects.get(pk=call.id)
+                call.uuid = call_uuid
+                call.save()
 
-        call = CallLog(number=dial_number,status=CallStatus.PENDING)
-        call.uuid = call_uuid
-        call.save()
-        call_id = call.id
+                call_id = call.id
+
+            else:
+                call = CallLog(number=dial_number,status=CallStatus.PENDING)
+                call.uuid = call_uuid
+                call.save()
+                call_id = call.id
 
         cmd = 'bgapi'
-        callParams = "{phoneai_call_id=%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (str(call_id),caller_id,call_uuid)
+        callParams = "{is_new_call=%s,phoneai_call_id=%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (str(is_new_call),str(call_id),caller_id,call_uuid)
         args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai.lua)" %(callParams,dial_number)
         print( "%s %s" %(cmd,args) )
         result = freeswitch_execute(cmd,args)

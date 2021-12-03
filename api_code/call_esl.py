@@ -166,6 +166,8 @@ try:
                         event_keys = get_header(e,"keys")
                         call_uuid = get_header(e,"call_uuid")
                         call_id = get_header(e,"call_id")
+                        is_new_call = get_header(e,"is_new_call")
+
                         log_info(f"{event_action} {call_id}")
                         # call_id = 1
                         if event_action == "call_keys":
@@ -178,8 +180,15 @@ try:
                                     for k in kk:
                                         if k:
                                             try:
-                                                callkey = CallKey(call=call,keys=k)
-                                                callkey.save()
+                                                if is_new_call == "1":
+                                                    callkey = CallKey(call=call,keys=k)
+                                                    callkey.save()
+                                                else:
+                                                    try:
+                                                        callkey = CallKey.objects.get(call=call,keys=k)
+                                                    except:
+                                                        callkey = CallKey(call=call,keys=k)
+                                                        callkey.save()
                                                 log_info(f"{callkey.id} key : {k}")
                                             except:
                                                 pass
@@ -194,7 +203,8 @@ try:
                                 callkeys = CallKey.objects.filter(call=call)
                                 if callkeys:
                                     for k in callkeys:
-                                        k.delete()
+                                        if is_new_call == "1":
+                                            k.delete()
                             except:
                                 logger.error("CallLog save error!!")
 
