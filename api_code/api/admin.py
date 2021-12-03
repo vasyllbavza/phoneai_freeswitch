@@ -60,6 +60,6 @@ class CallLogAdmin(admin.ModelAdmin):
 admin.site.register(CallLog, CallLogAdmin)
 
 class CallKeyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'call', 'parent', 'keys', 'level', 'processed', 'created_at', 'updated_at')
+    list_display = ('id', 'call', 'parent', 'keys', 'level', 'processed', 'audio_text','audio_file', 'created_at', 'updated_at')
 
 admin.site.register(CallKey, CallKeyAdmin)

@@ -39,6 +39,9 @@ class CallKey(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
+    audio_text = models.TextField(null=True, blank=True)
+    audio_file = models.TextField(null=True, blank=True)
+
     def __str__(self):
         return f"{self.id} , {self.keys}"
 
