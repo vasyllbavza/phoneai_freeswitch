@@ -14,6 +14,13 @@ sound = "/usr/share/freeswitch/sounds/silence_10m.wav";
 results = "";
 confidenceRef = 0.01;
 
+session:setVariable("call_menu_id", "0");
+call_menu_id = "0";
+record_uuid = api:execute("create_uuid","");
+record_base = "/var/lib/freeswitch/recordings/usermedia/";
+recordfile = record_base..record_uuid..".wav";
+wait_time_missed = 0;
+
 --collect parameter that passed from api request
 phoneai_call_id = session:getVariable("phoneai_call_id");
 is_new_call = session:getVariable("is_new_call");
@@ -122,6 +129,10 @@ function onInput(s, type, obj)
                evtdata["key_level"] = key_level;
                evtdata["key_parent"] = key_parent;
                evtdata['is_new_call'] = is_new_call;
+
+               evtdata['call_menu_id'] = call_menu_id;
+               evtdata['record_uuid'] = record_uuid;
+
                --initial event trigger for event handler [call_esl.py]
                mydtbd_send_event(evtdata);
             end
@@ -134,7 +145,7 @@ end
 --
 if (session:ready()) then
     session:answer();
-    
+
     session:execute("record_session",recordfile);
     call_start_epoch = os.time();
 
@@ -143,7 +154,6 @@ if (session:ready()) then
     -- session:execute("detect_speech", "pocketsphinx pai_number undefined");
     session:execute("detect_speech", "unimrcp:watson {start-input-timers=false}builtin:speech/transcribe undefined");
     -- session:streamFile(sound);
-
     while session:ready() do
         session:sleep(1000);
         if speaking_start > 0 then
@@ -152,22 +162,37 @@ if (session:ready()) then
             if wait_time > 5 then
                 local evtdata = {};
                 evtdata["action"] = "silence_detected";
-                evtdata['keys'] = key_collected;
-                evtdata['call_id'] = phoneai_call_id;
-                evtdata['call_uuid'] = uuid;
+                evtdata["keys"] = key_collected;
+                evtdata["call_id"] = phoneai_call_id;
+                evtdata["call_uuid"] = uuid;
                 evtdata["param1"] = "phoneAI";
                 evtdata["param2"] = destination_number;
                 evtdata["param3"] = key_collected;
                 evtdata["param4"] = speech_found;
                 evtdata["key_level"] = session:getVariable("key_level");
                 evtdata["key_parent"] = session:getVariable("key_parent");
-                evtdata['is_new_call'] = is_new_call;
-                -- send silence detected event to [call_esl.py]
-                -- which will initiate dtmf witH ESL interface
-                mydtbd_send_event(evtdata);
+                evtdata["is_new_call"] = is_new_call;
+
+                if key_collected ~= "" then
+                    evtdata["audio_text"] = speech_found;
+                    evtdata["call_menu_id"] = call_menu_id;
+                    evtdata["record_uuid"] = record_uuid;
+                    session:execute("stop_record_session",recordfile);
+                    record_uuid = api:execute("create_uuid","");
+                    recordfile = record_base..record_uuid..".wav";
+                    session:execute("record_session",recordfile);
+
+                    -- send silence detected event to [call_esl.py]
+                    -- which will initiate dtmf witH ESL interface
+                    mydtbd_send_event(evtdata);
+                    wait_time_missed = 0;
+                else
+                    wait_time_missed = wait_time_missed + 1;
+                end
                 wait_time = 0;
                 speaking_start = 0;
                 speech_found = "";
+                key_collected = "";
             end
         end
     end

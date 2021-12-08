@@ -66,6 +66,6 @@ class CallKeyAdmin(admin.ModelAdmin):
 admin.site.register(CallKey, CallKeyAdmin)
 
 class CallMenuAdmin(admin.ModelAdmin):
-    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'created_at', 'updated_at')
+    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'audio_text', 'created_at', 'updated_at')
 
 admin.site.register(CallMenu, CallMenuAdmin)

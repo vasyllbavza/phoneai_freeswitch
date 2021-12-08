@@ -18,6 +18,7 @@ from api.models import (
     CallLog,
     CallKey,
     CallStatus,
+    CallMenu,
 )
 
 try:
@@ -221,6 +222,13 @@ try:
                             key_parent = get_header(e, "key_parent")
                             key_level = get_header(e, "key_level")
                             call_keys = get_header(e, "param3")
+                            call_menu_id = get_header(e, "call_menu_id")
+                            record_uuid = get_header(e, "record_uuid")
+                            record_uuid = "%s.wav" % record_uuid
+                            audio_text = get_header(e, "audio_text")
+                            # call_id=1
+                            callmenu = CallMenu(call_id=call_id, audio_file = record_uuid, audio_text = audio_text)
+                            callmenu.save()
                             log_info("silence_detected")
                             ckeys = CallKey.objects.filter(call_id=call_id,processed=0,level=key_level).order_by('id')
                             if len(ckeys) > 0:
