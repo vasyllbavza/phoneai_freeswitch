@@ -9,6 +9,7 @@ from api.models import (
     CallLog,
     CallKey,
     CallStatus,
+    CallMenu
 )
 from api.views import freeswitch_execute
 
@@ -63,3 +64,8 @@ class CallKeyAdmin(admin.ModelAdmin):
     list_display = ('id', 'call', 'parent', 'keys', 'level', 'processed', 'audio_text','audio_file', 'created_at', 'updated_at')
 
 admin.site.register(CallKey, CallKeyAdmin)
+
+class CallMenuAdmin(admin.ModelAdmin):
+    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'created_at', 'updated_at')
+
+admin.site.register(CallMenu, CallMenuAdmin)

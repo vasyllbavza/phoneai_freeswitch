@@ -26,6 +26,11 @@ from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from api.views import HelloView, MakeCallView
 
+from django.conf import settings
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib.staticfiles.urls import static
+
+
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -53,3 +58,6 @@ urlpatterns = [
     path('api/hello/', HelloView.as_view(), name='hello'),
     path('api/makecall/',MakeCallView.as_view()),
 ]
+
+urlpatterns += staticfiles_urlpatterns()
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
