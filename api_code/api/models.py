@@ -21,6 +21,7 @@ class CallLog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
+    attempt = models.IntegerField(default=1)
 
     def __str__(self):
         return f"{self.number} [{self.id}]"
@@ -30,29 +31,6 @@ class CallLog(models.Model):
         managed = True
         verbose_name = 'CallLog'
         verbose_name_plural = 'CallLogs'
-
-class CallKey(models.Model):
-
-    call = models.ForeignKey(CallLog, on_delete=models.CASCADE)
-    parent = models.IntegerField(null=True, blank=True)
-    keys = models.CharField(max_length=5, blank=True, null=True)
-    level = models.IntegerField(default=0)
-    processed = models.IntegerField(default=0)
-
-    created_at = models.DateTimeField(auto_now_add=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True, null=True)
-
-    audio_text = models.TextField(null=True, blank=True)
-    audio_file = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.id} , {self.keys}"
-
-    class Meta:
-        db_table = 'call_keys'
-        managed = True
-        verbose_name = 'CallKey'
-        verbose_name_plural = 'CallKeys'
 
 class CallMenu(models.Model):
 
@@ -83,3 +61,28 @@ class CallMenu(models.Model):
         managed = True
         verbose_name = 'CallMenu'
         verbose_name_plural = 'CallMenus'
+
+class CallKey(models.Model):
+
+    # call = models.ForeignKey(CallLog, on_delete=models.CASCADE)
+    parent = models.IntegerField(null=True, blank=True)
+    keys = models.CharField(max_length=5, blank=True, null=True)
+    level = models.IntegerField(default=0)
+    processed = models.IntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    audio_text = models.TextField(null=True, blank=True)
+    audio_file = models.TextField(null=True, blank=True)
+
+    menu = models.ForeignKey(CallMenu, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"{self.id} , {self.keys}"
+
+    class Meta:
+        db_table = 'call_keys'
+        managed = True
+        verbose_name = 'CallKey'
+        verbose_name_plural = 'CallKeys'

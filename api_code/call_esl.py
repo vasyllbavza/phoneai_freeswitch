@@ -159,41 +159,41 @@ try:
                         logger.info(f"{event_action} {call_id}")
                         # debug
                         call_id = 1
-                        if event_action == "call_keys":
-                            try:
-                                call = CallLog.objects.get(pk=call_id)
-                                if event_keys:
-                                    kk = event_keys.split(",")
-                                    if not kk:
-                                        continue
-                                    for k in kk:
-                                        if k:
-                                            try:
-                                                if is_new_call == "1":
-                                                    callkey = CallKey(call=call,keys=k)
-                                                    callkey.save()
-                                                else:
-                                                    try:
-                                                        callkey = CallKey.objects.get(call=call,keys=k)
-                                                    except:
-                                                        callkey = CallKey(call=call,keys=k)
-                                                        callkey.save()
-                                                logger.info(f"{callkey.id} key : {k}")
-                                            except:
-                                                pass
-                            except:
-                                logger.error("callkey save error!!")
+                        # if event_action == "call_keys":
+                        #     try:
+                        #         call = CallLog.objects.get(pk=call_id)
+                        #         if event_keys:
+                        #             kk = event_keys.split(",")
+                        #             if not kk:
+                        #                 continue
+                        #             for k in kk:
+                        #                 if k:
+                        #                     try:
+                        #                         if is_new_call == "1":
+                        #                             callkey = CallKey(call=call,keys=k)
+                        #                             callkey.save()
+                        #                         else:
+                        #                             try:
+                        #                                 callkey = CallKey.objects.get(call=call,keys=k)
+                        #                             except:
+                        #                                 callkey = CallKey(call=call,keys=k)
+                        #                                 callkey.save()
+                        #                         logger.info(f"{callkey.id} key : {k}")
+                        #                     except:
+                        #                         pass
+                        #     except:
+                        #         logger.error("callkey save error!!")
 
                         if event_action == "call_started":
                             try:
                                 call = CallLog.objects.get(pk=call_id)
                                 call.status = CallStatus.ANSWERED
                                 call.save()
-                                callkeys = CallKey.objects.filter(call=call)
-                                if callkeys:
-                                    for k in callkeys:
-                                        if is_new_call == "1":
-                                            k.delete()
+                                # callkeys = CallKey.objects.filter(call=call)
+                                # if callkeys:
+                                #     for k in callkeys:
+                                #         if is_new_call == "1":
+                                #             k.delete()
                             except:
                                 logger.error("CallLog save error!!")
 
@@ -206,7 +206,7 @@ try:
                                 logger.error("CallLog save error!!")
 
                         if event_action == "silence_detected":
-                            print(e.serialize())
+                            # print(e.serialize())
                             key_parent = get_header(e, "key_parent")
                             key_level = get_header(e, "key_level")
                             call_keys = get_header(e, "param3")
@@ -214,10 +214,25 @@ try:
                             record_uuid = get_header(e, "record_uuid")
                             record_uuid = "%s.wav" % record_uuid
                             audio_text = get_header(e, "audio_text")
+
                             callmenu = CallMenu(call_id=call_id, audio_file = record_uuid, audio_text = audio_text)
                             callmenu.save()
+                            try:
+                                if event_keys:
+                                    kk = event_keys.split(",")
+                                    for k in kk:
+                                        if k:
+                                            try:
+                                                callkey = CallKey.objects.get(menu=callmenu,keys=k)
+                                            except:
+                                                callkey = CallKey(menu=callmenu,keys=k)
+                                                callkey.save()
+                                        logger.info(f"{callkey.id} key : {k}")
+                            except:
+                                logger.error("callkey save error!!")
+
                             logger.info("silence_detected")
-                            ckeys = CallKey.objects.filter(call_id=call_id,processed=0,level=key_level).order_by('id')
+                            ckeys = CallKey.objects.filter(menu=callmenu,processed=0,level=key_level).order_by('id')
                             if len(ckeys) > 0:
                                 ckey = ckeys[0]
                                 logger.info( f"sending DTMF [{ckey.keys}] to {call_id}, {call_uuid}")

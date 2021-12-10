@@ -14,7 +14,7 @@ from api.models import (
 from api.views import freeswitch_execute
 
 class CallLogAdmin(admin.ModelAdmin):
-    list_display = ('id', 'number', 'uuid', 'status', 'created_at', 'updated_at','hangup_link')
+    list_display = ('id', 'number', 'uuid', 'status', 'attempt', 'created_at', 'updated_at','hangup_link')
 
     actions = ['hangup_call']
 
@@ -61,11 +61,19 @@ class CallLogAdmin(admin.ModelAdmin):
 admin.site.register(CallLog, CallLogAdmin)
 
 class CallKeyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'call', 'parent', 'keys', 'level', 'processed', 'audio_text','audio_file', 'created_at', 'updated_at')
+    list_display = ('id', 'menu', 'keys', 'level', 'processed', 'audio_text','audio_file', 'created_at', 'updated_at')
+    list_filter = [
+        "menu",
+        "created_at",
+    ]
 
 admin.site.register(CallKey, CallKeyAdmin)
 
 class CallMenuAdmin(admin.ModelAdmin):
     list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'audio_text', 'created_at', 'updated_at')
+    list_filter = [
+        "call",
+        "created_at",
+    ]
 
 admin.site.register(CallMenu, CallMenuAdmin)
