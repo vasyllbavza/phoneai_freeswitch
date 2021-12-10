@@ -195,7 +195,7 @@ try:
                                 #         if is_new_call == "1":
                                 #             k.delete()
                             except:
-                                logger.error("CallLog save error!!")
+                                logger.exception("CallLog save error!!")
 
                         if event_action == "call_ended":
                             try:
