@@ -70,10 +70,18 @@ class CallKeyAdmin(admin.ModelAdmin):
 admin.site.register(CallKey, CallKeyAdmin)
 
 class CallMenuAdmin(admin.ModelAdmin):
-    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'audio_text', 'created_at', 'updated_at')
-    list_filter = [
-        "call",
-        "created_at",
-    ]
+
+    def ivrkeys(self):
+        html = ""
+        for obj in CallKey.objects.filter(menu__id=self.id):
+            html += '%s,' % obj.keys
+        return html
+    ivrkeys.allow_tags = True
+
+    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'audio_text', ivrkeys, 'created_at', 'updated_at')
+    # list_filter = [
+    #     "call",
+    #     "created_at",
+    # ]
 
 admin.site.register(CallMenu, CallMenuAdmin)
