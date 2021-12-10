@@ -158,7 +158,7 @@ try:
 
                         logger.info(f"{event_action} {call_id}")
                         # debug
-                        call_id = 1
+                        # call_id = 1
                         # if event_action == "call_keys":
                         #     try:
                         #         call = CallLog.objects.get(pk=call_id)
