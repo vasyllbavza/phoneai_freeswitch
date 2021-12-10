@@ -154,7 +154,8 @@ if (session:ready()) then
     -- session:execute("detect_speech", "pocketsphinx pai_number undefined");
     session:execute("detect_speech", "unimrcp:watson {start-input-timers=false}builtin:speech/transcribe undefined");
     -- session:streamFile(sound);
-    while session:ready() do
+    force_hangup = 0;
+    while session:ready() and force_hangup==0 do
         session:sleep(1000);
         if speaking_start > 0 then
             wait_time = os.time() - speaking_start;
@@ -191,6 +192,10 @@ if (session:ready()) then
                     freeswitch.consoleLog("ERR", "silence_detected with no key collected\n");
                     wait_time_missed = wait_time_missed + 1;
                     freeswitch.consoleLog("INFO", "wait_time_missed= "..wait_time_missed.."\n");
+                    if wait_time_missed > 10 then
+                        force_hangup = 1;
+                        freeswitch.consoleLog("INFO", "clean up call.\n");
+                    end
                 end
                 wait_time = 0;
                 speaking_start = 0;
@@ -211,5 +216,5 @@ if (session:ready()) then
     evtdata['call_id'] = phoneai_call_id;
     evtdata['call_uuid'] = uuid;
     mydtbd_send_event(evtdata);
-
+    session:hangup();
 end
