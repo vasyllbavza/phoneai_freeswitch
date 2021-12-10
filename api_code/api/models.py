@@ -56,6 +56,8 @@ class CallMenu(models.Model):
     audio_file_player.allow_tags = True
     audio_file_player.short_description = ('Audio file player')
 
+    route_keys = models.CharField(max_length=10, blank=True, null=True)
+
     class Meta:
         db_table = 'call_menu'
         managed = True

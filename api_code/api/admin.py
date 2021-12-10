@@ -78,7 +78,7 @@ class CallMenuAdmin(admin.ModelAdmin):
         return html
     ivrkeys.allow_tags = True
 
-    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'audio_text', ivrkeys, 'created_at', 'updated_at')
+    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'audio_text', ivrkeys, 'route_keys', 'created_at', 'updated_at')
     # list_filter = [
     #     "call",
     #     "created_at",
