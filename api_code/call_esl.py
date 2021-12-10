@@ -28,7 +28,16 @@ except ImportError:
     print("ESL")
 
 import logging
-logger = logging.getLogger('call_esl')
+
+logging.basicConfig(
+    filename='call_esl.log',
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)-6s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
+logger = logging.getLogger()
+handler = logging.StreamHandler(sys.stdout)
+logger.addHandler(handler)
 
 def signal_term_handler(signal, frame):
 
@@ -39,32 +48,10 @@ def signal_term_handler(signal, frame):
 
 signal.signal(signal.SIGTERM, signal_term_handler)
 
-def logme(level,title="",message=""):
-
-    print("%s %s ::  %s : %s" % (datetime.datetime.now(),level,title,message))
-    if level == "DEBUG":
-        logger.debug("%s %s ::  %s : %s" % (datetime.datetime.now(),level,title,message))
-    if level == "ERROR":
-        logger.error("%s %s ::  %s : %s" % (datetime.datetime.now(),level,title,message))
-    if level == "INFO":
-        logger.info("%s %s ::  %s : %s" % (datetime.datetime.now(),level,title,message))
-
-def log_debug(title,message=""):
-    logme("DEBUG",title,message)
-
-def log_error(title,message=""):
-    logme("ERROR",title,message)
-
-def log_info(title,message=""):
-    logme("INFO",title,message)
-
-def msg_inpect(msg):
-    logme("INFO",msg)
-
 def json_outp(jsondata):
 
     data = json.dumps(jsondata, indent=4, sort_keys=True)
-    log_info(data)
+    logger.info(data)
 
 def get_header(event,header_name):
     try:
@@ -87,7 +74,7 @@ def fs_send_dtmf(conn, uuid, dtmf):
         res = fs_result.split('\n\n',1)
         if res[1]:
             fs_result = res[1]
-            log_info(fs_result)
+            logger.info(fs_result)
             return True
     return False
 
@@ -102,7 +89,7 @@ def fs_set_var(conn, uuid, var, val):
         res = fs_result.split('\n\n',1)
         if res[1]:
             fs_result = res[1]
-            log_info(fs_result)
+            logger.info(fs_result)
             return True
     return False
 
@@ -110,13 +97,13 @@ con = ESL.ESLconnection(settings.ESL_HOSTNAME, settings.ESL_PORT, settings.ESL_S
 print("[x] Starting..")
 
 if con.connected():
-    log_info(" [x] FreeSWITCH is connected..")
-    log_info(con)
+    logger.info(" [x] FreeSWITCH is connected..")
+    logger.info(con)
 else:
-    log_error(" [x] FreeSWITCH connectivity Error!..")
+    logger.error(" [x] FreeSWITCH connectivity Error!..")
     sys.exit(1)
 
-log_debug(" [x] Starting.....OK")
+logger.info(" [x] Starting.....OK")
 
 try:
 
@@ -128,8 +115,8 @@ try:
         if con.connected():
             try:
                 e = con.recvEventTimed(2000)
-            except Exception as exp:
-                log_error( exp )
+            except Exception:
+                logger.exception( "Exception occured" )
                 exit(0)
 
             if e:
@@ -169,8 +156,9 @@ try:
                         call_id = get_header(e,"call_id")
                         is_new_call = get_header(e,"is_new_call")
 
-                        log_info(f"{event_action} {call_id}")
-                        # call_id = 1
+                        logger.info(f"{event_action} {call_id}")
+                        # debug
+                        call_id = 1
                         if event_action == "call_keys":
                             try:
                                 call = CallLog.objects.get(pk=call_id)
@@ -190,7 +178,7 @@ try:
                                                     except:
                                                         callkey = CallKey(call=call,keys=k)
                                                         callkey.save()
-                                                log_info(f"{callkey.id} key : {k}")
+                                                logger.info(f"{callkey.id} key : {k}")
                                             except:
                                                 pass
                             except:
@@ -226,14 +214,13 @@ try:
                             record_uuid = get_header(e, "record_uuid")
                             record_uuid = "%s.wav" % record_uuid
                             audio_text = get_header(e, "audio_text")
-                            # call_id=1
                             callmenu = CallMenu(call_id=call_id, audio_file = record_uuid, audio_text = audio_text)
                             callmenu.save()
-                            log_info("silence_detected")
+                            logger.info("silence_detected")
                             ckeys = CallKey.objects.filter(call_id=call_id,processed=0,level=key_level).order_by('id')
                             if len(ckeys) > 0:
                                 ckey = ckeys[0]
-                                log_info( f"sending DTMF [{ckey.keys}] to {call_id}, {call_uuid}")
+                                logger.info( f"sending DTMF [{ckey.keys}] to {call_id}, {call_uuid}")
                                 ckey.processed=1
                                 ckey.save()
                                 fs_send_dtmf(con, call_uuid, ckey.keys)
@@ -250,26 +237,21 @@ try:
                     idle_count = 222
 
         else:
-            log_error("FreeSWITCH gone away. we are closing here")
+            logger.error("FreeSWITCH gone away. we are closing here")
             sys.exit(0)
 
 except KeyboardInterrupt:
 
-    log_error("KeyboardInterrupt..Good bye")
+    logger.error("KeyboardInterrupt..Good bye")
     con.disconnect()
     sys.exit(0)
 
 except SystemExit:
 
-    log_error("SystemExit..Good bye")
+    logger.error("SystemExit..Good bye")
     con.disconnect()
     sys.exit(0)
 
-except Exception as e:
+except Exception:
 
-    log_error(e)
-
-except:
-
-    log_error("unknown error!")
-    pass
+    logger.exception("error found!!")
