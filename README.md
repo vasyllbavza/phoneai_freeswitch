@@ -27,6 +27,13 @@ Four Section
         https://phoneai.boomslang.io/api/makecall/?number=1XXXXXXXXXX
 ```
 
+    To make the call menu complete of old in-complement menu we can use an extra param for this
+    example:
+```
+    curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
+        https://phoneai.boomslang.io/api/makecall/?number=1XXXXXXXXXX&new=0
+```
+
 3) dtmf input processing and store and initiate crawling
     api_code/call_esl.py
 
