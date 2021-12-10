@@ -134,7 +134,9 @@ function onInput(s, type, obj)
                evtdata['record_uuid'] = record_uuid;
 
                --initial event trigger for event handler [call_esl.py]
-               mydtbd_send_event(evtdata);
+                if new_key ~= nil and new_key ~= "" then
+                    mydtbd_send_event(evtdata);
+                end
             end
         end
     end
