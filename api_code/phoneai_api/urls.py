@@ -24,8 +24,11 @@ from django.urls import path
 from django.urls import path, include
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
-from api.views import HelloView, MakeCallView
-
+from api.views import (
+    HelloView,
+    MakeCallView,
+    ScanCallView,
+)
 from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.staticfiles.urls import static
@@ -57,6 +60,7 @@ urlpatterns = [
     # path('status/'), FreeswitchStatus.as_view()),
     path('api/hello/', HelloView.as_view(), name='hello'),
     path('api/makecall/',MakeCallView.as_view()),
+    path('api/scan/',ScanCallView.as_view()),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

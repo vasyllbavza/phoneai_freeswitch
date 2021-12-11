@@ -9,11 +9,13 @@ from rest_framework.authentication import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import LimitOffsetPagination
 
 from api.models import (
     CallLog,
     CallStatus,
 )
+from api.serializer import CallLogSerializer
 
 from phoneai_api import settings
 
@@ -113,4 +115,23 @@ class MakeCallView(APIView):
         call.save()
 
         return Response(content)
+
+class ScanCallView(APIView, LimitOffsetPagination):
+
+    def get(self,request,format=None):
+
+        content = {}
+        content['status'] = "success"
+
+        dial_number = request.query_params.get('number','')
+        if dial_number == "":
+            call = CallLog.objects.all().order_by('-id')
+        else:
+            call = CallLog.objects.filter(number=dial_number).order_by('-id')
+
+        result = self.paginate_queryset(call, request, view=self)
+
+        serializer = CallLogSerializer(result, many=True)
+
+        return self.get_paginated_response(serializer.data)
 
