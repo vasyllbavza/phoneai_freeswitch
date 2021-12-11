@@ -11,6 +11,7 @@ class CallLogSerializer(ModelSerializer):
         fields = [
             "id",
             "number",
+            "business_name",
             "status",
             "attempt",
             "created_at",

@@ -23,6 +23,8 @@ class CallLog(models.Model):
 
     attempt = models.IntegerField(default=1)
 
+    business_name = models.TextField(null=True, blank=True)
+
     def __str__(self):
         return f"{self.number} [{self.id}]"
 

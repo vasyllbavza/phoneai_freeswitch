@@ -14,7 +14,7 @@ from api.models import (
 from api.views import freeswitch_execute
 
 class CallLogAdmin(admin.ModelAdmin):
-    list_display = ('id', 'number', 'uuid', 'status', 'attempt', 'created_at', 'updated_at','hangup_link')
+    list_display = ('id', 'number', 'business_name', 'uuid', 'status', 'attempt', 'created_at', 'updated_at','hangup_link')
 
     actions = ['hangup_call']
 

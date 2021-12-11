@@ -71,10 +71,12 @@ class MakeCallView(APIView):
         dial_number = request.query_params.get('number','')
         caller_id = request.query_params.get('caller_id','14582037530')
         is_new_call = request.query_params.get('new','1')
+        business_name = request.query_params.get('business_name','')
 
         call_uuid = str(uuid.uuid4())
         if is_new_call == "1":
             call = CallLog(number=dial_number,status=CallStatus.PENDING)
+            call.business_name = business_name
             call.uuid = call_uuid
             call.save()
             call_id = call.id
