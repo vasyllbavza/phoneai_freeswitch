@@ -39,7 +39,7 @@ Four Section
     example:
 ```
     curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
-        https://phoneai.boomslang.io/api/scan/?limit=10&offset=0&number=18009256278
+        https://phoneai.boomslang.io/api/scan/?limit=3&offset=0&number=18009256278
 
     Response:
         {
