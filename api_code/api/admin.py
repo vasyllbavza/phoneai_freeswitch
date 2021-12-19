@@ -9,12 +9,23 @@ from api.models import (
     CallLog,
     CallKey,
     CallStatus,
-    CallMenu
+    CallMenu,
+    PhoneNumber
 )
 from api.views import freeswitch_execute
 
+class PhoneNumberAdmin(admin.ModelAdmin):
+    list_display = ('id', 'number', 'business_name' ,'attempt', 'created_at', 'updated_at')
+    list_filter = [
+        "attempt",
+        "created_at",
+    ]
+    search_fields = ['number', 'business_name']
+
+admin.site.register(PhoneNumber, PhoneNumberAdmin)
+
 class CallLogAdmin(admin.ModelAdmin):
-    list_display = ('id', 'number', 'business_name', 'uuid', 'status', 'attempt', 'created_at', 'updated_at','hangup_link')
+    list_display = ('id', 'number', 'uuid', 'status', 'created_at', 'updated_at','hangup_link')
 
     actions = ['hangup_call']
 
@@ -61,7 +72,7 @@ class CallLogAdmin(admin.ModelAdmin):
 admin.site.register(CallLog, CallLogAdmin)
 
 class CallKeyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'menu', 'keys', 'level', 'processed', 'audio_text','audio_file', 'created_at', 'updated_at')
+    list_display = ('id', 'menu', 'keys' ,'next', 'created_at', 'updated_at')
     list_filter = [
         "menu",
         "created_at",

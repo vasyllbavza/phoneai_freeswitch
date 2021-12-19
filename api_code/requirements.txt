@@ -10,3 +10,4 @@ sqlparse==0.4.2
 typing-extensions==3.10.0.2
 zipp==3.5.0
 FreeSWITCH-ESL-Python==1.2
+django-audiofield @ git+https://github.com/romonzaman/django-audiofield.git@9108921d8816ec19a826799dca72a5af09da4c51

@@ -12,18 +12,33 @@ class CallStatus(models.IntegerChoices):
     SUCCESS = 4, 'Success'
     FAILED = 5, 'Failed'
 
-class CallLog(models.Model):
+class PhoneNumber(models.Model):
 
     number = models.CharField(max_length=15, blank=True, null=True)
+    business_name = models.TextField(null=True, blank=True)
+
+    attempt = models.IntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    class Meta:
+        db_table = 'phone_numbers'
+        managed = True
+        verbose_name = 'Phonenumber'
+        verbose_name_plural = 'Phonenumbers'
+
+    def __str__(self) -> str:
+        return super().__str__()
+
+class CallLog(models.Model):
+
+    number = models.ForeignKey(PhoneNumber, on_delete=models.CASCADE)
     uuid = models.CharField(max_length=250, blank=True, null=True)
     status = models.IntegerField(default=CallStatus.PENDING, choices=CallStatus.choices)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
-
-    attempt = models.IntegerField(default=1)
-
-    business_name = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.number} [{self.id}]"
@@ -68,19 +83,19 @@ class CallMenu(models.Model):
 
 class CallKey(models.Model):
 
-    # call = models.ForeignKey(CallLog, on_delete=models.CASCADE)
-    parent = models.IntegerField(null=True, blank=True)
-    keys = models.CharField(max_length=5, blank=True, null=True)
-    level = models.IntegerField(default=0)
-    processed = models.IntegerField(default=0)
+    menu = models.ForeignKey(CallMenu, on_delete=models.CASCADE, null=True)
 
-    created_at = models.DateTimeField(auto_now_add=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True, null=True)
+    keys = models.CharField(max_length=5, blank=True, null=True)
+
+    processed = models.IntegerField(default=0)
 
     audio_text = models.TextField(null=True, blank=True)
     audio_file = models.TextField(null=True, blank=True)
 
-    menu = models.ForeignKey(CallMenu, on_delete=models.CASCADE, null=True)
+    next = models.OneToOneField(CallMenu, on_delete=models.CASCADE, null=True, blank=True, related_name="next")
+
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return f"{self.id} , {self.keys}"
