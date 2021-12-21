@@ -91,7 +91,6 @@ class MakeCallView(APIView):
             if call:
                 call = CallLog.objects.get(pk=call.id)
                 call.uuid = call_uuid
-                call.attempt = call.attempt + 1
                 call.save()
 
                 call_id = call.id
