@@ -187,6 +187,7 @@ try:
                         #         logger.error("callkey save error!!")
 
                         if event_action == "call_started":
+                            print(e.serialize())
                             try:
                                 number = PhoneNumber.objects.get(pk=number_id)
                                 number.attempt = number.attempt + 1
