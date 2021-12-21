@@ -271,6 +271,10 @@ try:
                                     menu = CallMenu(call_id=call_id)
                                     menu.save()
                                     call_menu_id = menu.id
+
+                                    ckey.next = menu
+                                    ckey.save()
+
                                     fs_set_var(con, call_uuid, "call_menu_id", call_menu_id)
 
                                     fs_send_dtmf(con, call_uuid, ckey.keys)
