@@ -22,6 +22,7 @@ recordfile = record_base..record_uuid..".wav";
 wait_time_missed = 0;
 
 --collect parameter that passed from api request
+phoneai_number_id = session:getVariable("phoneai_number_id");
 phoneai_call_id = session:getVariable("phoneai_call_id");
 is_new_call = session:getVariable("is_new_call");
 uuid = session:getVariable("uuid");
@@ -31,6 +32,7 @@ if destination_number == nil then destination_number = ""; end
 --event data object
 local evtdata = {};
 evtdata["action"] = "call_started";
+evtdata['number_id'] = phoneai_number_id;
 evtdata['call_id'] = phoneai_call_id;
 evtdata['call_uuid'] = uuid;
 evtdata['is_new_call'] = is_new_call;

@@ -19,6 +19,7 @@ from api.models import (
     CallKey,
     CallStatus,
     CallMenu,
+    PhoneNumber,
 )
 
 try:
@@ -153,6 +154,7 @@ try:
                         event_action = get_header(e,"action")
                         event_keys = get_header(e,"keys")
                         call_uuid = get_header(e,"call_uuid")
+                        number_id = get_header(e,"number_id")
                         call_id = get_header(e,"call_id")
                         is_new_call = get_header(e,"is_new_call")
 
@@ -186,6 +188,10 @@ try:
 
                         if event_action == "call_started":
                             try:
+                                number = PhoneNumber.objects.get(pk=number_id)
+                                number.attempt = number.attempt + 1
+                                number.save()
+
                                 call = CallLog.objects.get(pk=call_id)
                                 call.status = CallStatus.ANSWERED
                                 call.save()
@@ -207,41 +213,43 @@ try:
 
                         if event_action == "silence_detected":
                             # print(e.serialize())
-                            key_parent = get_header(e, "key_parent")
-                            key_level = get_header(e, "key_level")
-                            call_keys = get_header(e, "param3")
-                            call_menu_id = get_header(e, "call_menu_id")
-                            record_uuid = get_header(e, "record_uuid")
-                            record_uuid = "%s.wav" % record_uuid
-                            audio_text = get_header(e, "audio_text")
-
-                            callmenu = CallMenu(call_id=call_id, audio_file = record_uuid, audio_text = audio_text)
-                            callmenu.save()
                             try:
-                                if event_keys:
-                                    kk = event_keys.split(",")
-                                    for k in kk:
-                                        if k:
-                                            try:
-                                                callkey = CallKey.objects.get(menu=callmenu,keys=k)
-                                            except:
-                                                callkey = CallKey(menu=callmenu,keys=k)
-                                                callkey.save()
-                                        logger.info(f"{callkey.id} key : {k}")
-                            except:
-                                logger.error("callkey save error!!")
+                                key_parent = get_header(e, "key_parent")
+                                key_level = get_header(e, "key_level")
+                                call_keys = get_header(e, "param3")
+                                call_menu_id = get_header(e, "call_menu_id")
+                                record_uuid = get_header(e, "record_uuid")
+                                record_uuid = "%s.wav" % record_uuid
+                                audio_text = get_header(e, "audio_text")
 
-                            logger.info("silence_detected")
-                            ckeys = CallKey.objects.filter(menu=callmenu,processed=0,level=key_level).order_by('id')
-                            if len(ckeys) > 0:
-                                ckey = ckeys[0]
-                                logger.info( f"sending DTMF [{ckey.keys}] to {call_id}, {call_uuid}")
-                                ckey.processed=1
-                                ckey.save()
-                                fs_send_dtmf(con, call_uuid, ckey.keys)
-                                fs_set_var(con, call_uuid,"key_level", int(key_level)+1)
-                                fs_set_var(con, call_uuid,"key_parent", ckey.id)
-                            pass
+                                callmenu = CallMenu(call_id=call_id, audio_file = record_uuid, audio_text = audio_text)
+                                callmenu.save()
+                                try:
+                                    if event_keys:
+                                        kk = event_keys.split(",")
+                                        for k in kk:
+                                            if k:
+                                                try:
+                                                    callkey = CallKey.objects.get(menu=callmenu,keys=k)
+                                                except:
+                                                    callkey = CallKey(menu=callmenu,keys=k)
+                                                    callkey.save()
+                                            logger.info(f"{callkey.id} key : {k}")
+                                except Exception:
+                                    logger.exception("callkey save error!!")
+
+                                logger.info("silence_detected")
+                                ckeys = CallKey.objects.filter(menu=callmenu,processed=0).order_by('id')
+                                if len(ckeys) > 0:
+                                    ckey = ckeys[0]
+                                    logger.info( f"sending DTMF [{ckey.keys}] to {call_id}, {call_uuid}")
+                                    ckey.processed=1
+                                    ckey.save()
+                                    fs_send_dtmf(con, call_uuid, ckey.keys)
+                                    fs_set_var(con, call_uuid,"key_level", int(key_level)+1)
+                                    fs_set_var(con, call_uuid,"key_parent", ckey.id)
+                            except Exception:
+                                logger.exception("silence_detected: error!!!")
             else:
                 if idle_count < 120:
                     idle_count = idle_count + 1

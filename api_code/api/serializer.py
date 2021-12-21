@@ -10,7 +10,7 @@ class CallLogSerializer(ModelSerializer):
         model = CallLog
         fields = [
             "id",
-            "number",
+            "phone_number",
             "business_name",
             "status",
             "attempt",
@@ -19,3 +19,6 @@ class CallLogSerializer(ModelSerializer):
         ]
 
     status = CharField(source='get_status_display')
+    phone_number = CharField(source='number.number')
+    business_name = CharField(source='number.business_name')
+    attempt = CharField(source='number.attempt')

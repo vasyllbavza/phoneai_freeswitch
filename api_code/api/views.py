@@ -74,15 +74,20 @@ class MakeCallView(APIView):
         is_new_call = request.query_params.get('new','1')
         business_name = request.query_params.get('business_name','')
 
+        number, isnew = PhoneNumber.objects.get_or_create(number=dial_number)
+        if business_name:
+            number.business_name = business_name
+        number.save()
+
         call_uuid = str(uuid.uuid4())
         if is_new_call == "1":
-            call = CallLog(number=dial_number,status=CallStatus.PENDING)
+            call = CallLog(number=number,status=CallStatus.PENDING)
             call.business_name = business_name
             call.uuid = call_uuid
             call.save()
             call_id = call.id
         else:
-            call = CallLog.objects.filter(number=dial_number).order_by('-id').first()
+            call = CallLog.objects.filter(number=number).order_by('-id').first()
             if call:
                 call = CallLog.objects.get(pk=call.id)
                 call.uuid = call_uuid
@@ -92,13 +97,14 @@ class MakeCallView(APIView):
                 call_id = call.id
 
             else:
-                call = CallLog(number=dial_number,status=CallStatus.PENDING)
+                call = CallLog(number=number,status=CallStatus.PENDING)
                 call.uuid = call_uuid
                 call.save()
                 call_id = call.id
 
         cmd = 'bgapi'
-        callParams = "{is_new_call=%s,phoneai_call_id=%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (str(is_new_call),str(call_id),caller_id,call_uuid)
+        phonenumber_info = "is_new_call=%s,phoneai_number_id=%s,phoneai_call_id=%s" % (str(is_new_call),str(number.id),str(call_id))
+        callParams = "{%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (phonenumber_info,caller_id,call_uuid)
         args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai.lua)" %(callParams,dial_number)
         print( "%s %s" %(cmd,args) )
         result = freeswitch_execute(cmd,args)
@@ -130,7 +136,7 @@ class ScanCallView(APIView, LimitOffsetPagination):
         if dial_number == "":
             call = CallLog.objects.all().order_by('-id')
         else:
-            call = CallLog.objects.filter(number=dial_number).order_by('-id')
+            call = CallLog.objects.filter(number__number=dial_number).order_by('-id')
 
         result = self.paginate_queryset(call, request, view=self)
 
