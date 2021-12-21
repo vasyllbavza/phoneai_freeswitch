@@ -238,6 +238,14 @@ try:
                                 except Exception:
                                     logger.exception("callkey save error!!")
 
+                                if key_parent:
+                                    try:
+                                        ck = CallKey.objects.get(pk=key_parent)
+                                        ck.next = callmenu
+                                        ck.save()
+                                    except Exception:
+                                        logger.exception("next menu save error")
+
                                 logger.info("silence_detected")
                                 ckeys = CallKey.objects.filter(menu=callmenu,processed=0).order_by('id')
                                 if len(ckeys) > 0:
