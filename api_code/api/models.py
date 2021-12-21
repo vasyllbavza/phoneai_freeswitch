@@ -92,7 +92,7 @@ class CallKey(models.Model):
     audio_text = models.TextField(null=True, blank=True)
     audio_file = models.TextField(null=True, blank=True)
 
-    next = models.OneToOneField(CallMenu, on_delete=models.CASCADE, null=True, blank=True, related_name="next")
+    next = models.ForeignKey(CallMenu, on_delete=models.CASCADE, null=True, blank=True, unique=False, related_name="next")
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)

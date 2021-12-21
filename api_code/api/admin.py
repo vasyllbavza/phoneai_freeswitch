@@ -82,14 +82,33 @@ admin.site.register(CallKey, CallKeyAdmin)
 
 class CallMenuAdmin(admin.ModelAdmin):
 
-    def ivrkeys(self):
+    def keys(self):
         html = ""
         for obj in CallKey.objects.filter(menu__id=self.id):
             html += '%s,' % obj.keys
         return html
-    ivrkeys.allow_tags = True
+    keys.allow_tags = True
+    keys.name = "Keys"
 
-    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'audio_text', ivrkeys, 'route_keys', 'created_at', 'updated_at')
+    def routekeys(self):
+        html = ""
+        cm = CallMenu.objects.get(pk=self.id)
+        firstmenu = CallMenu.objects.filter(call__number__id=cm.call.number.id).first()
+        cur_menu_id = self.id
+        loop_count = 1
+        while firstmenu.id != cur_menu_id and loop_count < 10:
+            ck = CallKey.objects.filter(next__id=cur_menu_id).first()
+            if ck:
+                html += '%s,' % ck.keys
+                cur_menu_id = ck.menu.id
+            loop_count = loop_count + 1
+
+        return html
+
+    routekeys.allow_tags = True
+
+
+    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'audio_text', keys, routekeys, 'created_at', 'updated_at')
     # list_filter = [
     #     "call",
     #     "created_at",
