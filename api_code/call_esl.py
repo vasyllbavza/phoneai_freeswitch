@@ -212,7 +212,7 @@ try:
                                 logger.error("CallLog save error!!")
 
                         if event_action == "silence_detected":
-                            # print(e.serialize())
+                            print(e.serialize())
                             try:
                                 key_parent = get_header(e, "key_parent")
                                 key_level = get_header(e, "key_level")
@@ -238,13 +238,15 @@ try:
                                 except Exception:
                                     logger.exception("callkey save error!!")
 
-                                if key_parent:
+                                if key_parent and key_parent != "0":
                                     try:
                                         ck = CallKey.objects.get(pk=key_parent)
                                         ck.next = callmenu
                                         ck.save()
                                     except Exception:
                                         logger.exception("next menu save error")
+                                else:
+                                    logger.info("key_parent is missing")
 
                                 logger.info("silence_detected")
                                 ckeys = CallKey.objects.filter(menu=callmenu,processed=0).order_by('id')
