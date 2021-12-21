@@ -14,8 +14,8 @@ sound = "/usr/share/freeswitch/sounds/silence_10m.wav";
 results = "";
 confidenceRef = 0.01;
 
-session:setVariable("call_menu_id", "0");
-call_menu_id = "0";
+call_menu_id = session:getVariable("call_menu_id");
+
 record_uuid = api:execute("create_uuid","");
 record_base = "/var/lib/freeswitch/recordings/usermedia/";
 recordfile = record_base..record_uuid..".wav";
@@ -35,6 +35,7 @@ evtdata["action"] = "call_started";
 evtdata['number_id'] = phoneai_number_id;
 evtdata['call_id'] = phoneai_call_id;
 evtdata['call_uuid'] = uuid;
+evtdata['call_menu_id'] = call_menu_id;
 evtdata['is_new_call'] = is_new_call;
 
 mydtbd_send_event(evtdata);
@@ -176,12 +177,13 @@ if (session:ready()) then
                 evtdata["param4"] = speech_found;
                 evtdata["key_level"] = session:getVariable("key_level");
                 evtdata["key_parent"] = session:getVariable("key_parent");
+                call_menu_id = session:getVariable("call_menu_id");
+                evtdata["call_menu_id"] = call_menu_id;
                 evtdata["is_new_call"] = is_new_call;
 
                 if key_collected ~= "" then
                     freeswitch.consoleLog("info", "silence_detected event triggering.\n");
                     evtdata["audio_text"] = speech_found;
-                    evtdata["call_menu_id"] = call_menu_id;
                     evtdata["record_uuid"] = record_uuid;
                     session:execute("stop_record_session",recordfile);
                     record_uuid = api:execute("create_uuid","");

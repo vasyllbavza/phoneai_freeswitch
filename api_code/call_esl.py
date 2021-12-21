@@ -156,8 +156,8 @@ try:
                         call_uuid = get_header(e,"call_uuid")
                         number_id = get_header(e,"number_id")
                         call_id = get_header(e,"call_id")
+                        call_menu_id = get_header(e, "call_menu_id")
                         is_new_call = get_header(e,"is_new_call")
-
                         logger.info(f"{event_action} {call_id}")
                         # debug
                         # call_id = 1
@@ -200,6 +200,12 @@ try:
                                 #     for k in callkeys:
                                 #         if is_new_call == "1":
                                 #             k.delete()
+                                if call_menu_id:
+                                    if call_menu_id == "0":
+                                        menu = CallMenu(call=call)
+                                        menu.save()
+                                        fs_set_var(con, call_uuid,"call_menu_id", menu.id)
+
                             except:
                                 logger.exception("CallLog save error!!")
 
@@ -221,9 +227,14 @@ try:
                                 record_uuid = get_header(e, "record_uuid")
                                 record_uuid = "%s.wav" % record_uuid
                                 audio_text = get_header(e, "audio_text")
-
-                                callmenu = CallMenu(call_id=call_id, audio_file = record_uuid, audio_text = audio_text)
-                                callmenu.save()
+                                if call_menu_id:
+                                    callmenu = CallMenu.objects.get(pk=call_menu_id)
+                                    callmenu.audio_file = record_uuid
+                                    callmenu.audio_text = audio_text
+                                    callmenu.save()
+                                else:
+                                    callmenu = CallMenu(call_id=call_id, audio_file = record_uuid, audio_text = audio_text)
+                                    callmenu.save()
                                 try:
                                     if event_keys:
                                         kk = event_keys.split(",")
@@ -238,15 +249,15 @@ try:
                                 except Exception:
                                     logger.exception("callkey save error!!")
 
-                                if key_parent and key_parent != "0":
-                                    try:
-                                        ck = CallKey.objects.get(pk=key_parent)
-                                        ck.next = callmenu
-                                        ck.save()
-                                    except Exception:
-                                        logger.exception("next menu save error")
-                                else:
-                                    logger.info("key_parent is missing")
+                                # if key_parent and key_parent != "0":
+                                #     try:
+                                #         ck = CallKey.objects.get(pk=key_parent)
+                                #         ck.next = callmenu
+                                #         ck.save()
+                                #     except Exception:
+                                #         logger.exception("next menu save error")
+                                # else:
+                                #     logger.info("key_parent is missing")
 
                                 logger.info("silence_detected")
                                 ckeys = CallKey.objects.filter(menu=callmenu,processed=0).order_by('id')
@@ -255,9 +266,15 @@ try:
                                     logger.info( f"sending DTMF [{ckey.keys}] to {call_id}, {call_uuid}")
                                     ckey.processed=1
                                     ckey.save()
+
+                                    menu = CallMenu(call_id=call_id)
+                                    menu.save()
+                                    call_menu_id = menu.id
+                                    fs_set_var(con, call_uuid, "call_menu_id", call_menu_id)
+
                                     fs_send_dtmf(con, call_uuid, ckey.keys)
-                                    fs_set_var(con, call_uuid,"key_level", int(key_level)+1)
-                                    fs_set_var(con, call_uuid,"key_parent", ckey.id)
+                                    fs_set_var(con, call_uuid, "key_level", int(key_level)+1)
+                                    fs_set_var(con, call_uuid, "key_parent", ckey.id)
                             except Exception:
                                 logger.exception("silence_detected: error!!!")
             else:
