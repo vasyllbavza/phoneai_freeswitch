@@ -175,8 +175,10 @@ if (session:ready()) then
                 evtdata["param2"] = destination_number;
                 evtdata["param3"] = key_collected;
                 evtdata["param4"] = speech_found;
-                evtdata["key_level"] = session:getVariable("key_level");
-                evtdata["key_parent"] = session:getVariable("key_parent");
+                key_level = session:getVariable("key_level");
+                evtdata["key_level"] = key_level;
+                key_parent = session:getVariable("key_parent");
+                evtdata["key_parent"] = key_parent;
                 call_menu_id = session:getVariable("call_menu_id");
                 evtdata["call_menu_id"] = call_menu_id;
                 evtdata["is_new_call"] = is_new_call;
@@ -221,6 +223,10 @@ if (session:ready()) then
     evtdata["action"] = "call_ended";
     evtdata['call_id'] = phoneai_call_id;
     evtdata['call_uuid'] = uuid;
+    evtdata["call_menu_id"] = call_menu_id;
+    evtdata["audio_text"] = speech_found;
+    evtdata["record_uuid"] = record_uuid;
+    evtdata["key_level"] = key_level;
     mydtbd_send_event(evtdata);
     session:hangup();
 end

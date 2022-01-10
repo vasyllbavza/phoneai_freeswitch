@@ -1,6 +1,7 @@
 import uuid
 
 from django.shortcuts import render
+from api.models import CallKey, CallMenu
 from rest_framework.authentication import (
     SessionAuthentication,
     BasicAuthentication,
@@ -10,12 +11,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import LimitOffsetPagination
+import json
 
 from api.models import (
     CallLog,
     CallStatus,
     PhoneNumber,
 )
+from api.utils import TreeNode
 from api.serializer import CallLogSerializer
 
 from phoneai_api import settings
@@ -142,4 +145,32 @@ class ScanCallView(APIView, LimitOffsetPagination):
         serializer = CallLogSerializer(result, many=True)
 
         return self.get_paginated_response(serializer.data)
+
+class ShowCallMenu(APIView):
+
+    def get(self, request, format=None):
+
+        dial_number = request.query_params.get('number','')
+
+        content = {}
+        content['status'] = 'success'
+        node_start = 0
+        cm = CallMenu.objects.filter(call__number__number=dial_number).first()
+        tree = TreeNode(cm.audio_text)
+        # for cm in cms:
+        #     if node_start == 0:
+        #         tree = TreeNode(cm.audio_text)
+        #     cks = CallKey.objects.filter(next__id=cm.id)
+        #     for ck in cks:
+        #     tree = TreeNode('Parent')
+        #     tree.children.append(TreeNode('Child 1'))
+        #     child2 = TreeNode('Child 2')
+        #     tree.children.append(child2)
+        #     child2.children.append(TreeNode('Grand Kid'))
+        #     child2.children[0].children.append(TreeNode('Great Grand Kid'))
+
+        json_str = json.dumps(tree, indent=2)
+        print(json_str)
+        content["menu"] = tree
+        return Response(content)
 

@@ -28,6 +28,7 @@ from api.views import (
     HelloView,
     MakeCallView,
     ScanCallView,
+    ShowCallMenu
 )
 from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -61,6 +62,7 @@ urlpatterns = [
     path('api/hello/', HelloView.as_view(), name='hello'),
     path('api/makecall/',MakeCallView.as_view()),
     path('api/scan/',ScanCallView.as_view()),
+    path('api/callmenu/',ShowCallMenu.as_view()),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
