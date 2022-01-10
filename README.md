@@ -75,6 +75,60 @@ Four Section
         }
 ```
 
+    To get Call menu tree, we can use this api
+    example:
+```
+    curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
+        https://phoneai.boomslang.io/api/callmenu/?number=18009256278
+
+    Response:
+        {
+            "status": "success",
+            "menu": {
+                "data": " if you're calling about your walmart dot com order online pick up or delivery order press one for the phone number location and hours of operation of a walmart store or sam's club press two if you're calling about a store experience walmart gift card or walmart credit card press three for more information about the kobe nineteen vaccine press four to contact sam's club press five for in flyer press six if you are a current or former associate press seven to repeat these options press the star key",
+                "key": null,
+                "children": [
+                    {
+                        "data": "",
+                        "key": "3",
+                        "children": []
+                    },
+                    {
+                        "data": "",
+                        "key": "6",
+                        "children": []
+                    },
+                    {
+                        "data": "",
+                        "key": "7",
+                        "children": []
+                    },
+                    {
+                        "data": " calling about your walmart dot com order online pick up or delivery order press one for the phone number location and hours of operation of a walmart store or sam's club press two if you're calling about a store experience walmart gift card or walmart credit card press three for more information about the covert nineteen vaccine press four to contact sam's club press five for in",
+                        "key": "1",
+                        "children": []
+                    },
+                    {
+                        "data": " if you're calling about your walmart dot com order online pick up or delivery order press one for the phone number location and hours of operation of a walmart store or sam's club press two if you're calling about a store experience walmart gift card or walmart credit card press three for more information about the covert nineteen vaccine press four to contact sam's club press five for",
+                        "key": "2",
+                        "children": []
+                    },
+                    {
+                        "data": "",
+                        "key": "4",
+                        "children": []
+                    },
+                    {
+                        "data": "",
+                        "key": "5",
+                        "children": []
+                    }
+                ]
+            }
+        }
+```
+
+https://phoneai.boomslang.io/api/callmenu/?number=18009256278
 3) dtmf input processing and store and initiate crawling
     api_code/call_esl.py
 
@@ -85,3 +139,4 @@ Four Section
     user: admin
     pass: nguAO0YesMt162fnVbMwTa0tgeg
 ```
+
