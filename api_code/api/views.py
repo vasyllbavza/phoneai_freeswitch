@@ -82,6 +82,7 @@ class MakeCallView(APIView):
             number.business_name = business_name
         number.save()
 
+        call_menu_id = 0
         call_uuid = str(uuid.uuid4())
         if is_new_call == "1":
             call = CallLog(number=number,status=CallStatus.PENDING)
@@ -104,7 +105,9 @@ class MakeCallView(APIView):
                 call.save()
                 call_id = call.id
 
-        call_menu_id = 21
+            firstmenu = CallMenu.objects.filter(call__number__number=number).first()
+            if firstmenu:
+                call_menu_id = firstmenu.id
 
         cmd = 'bgapi'
         phonenumber_info = "is_new_call=%s,phoneai_number_id=%s,phoneai_call_id=%s,call_menu_id=%s" % (str(is_new_call),str(number.id),str(call_id), str(call_menu_id))
