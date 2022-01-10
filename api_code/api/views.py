@@ -157,11 +157,11 @@ class ShowCallMenu(APIView):
         node_start = 0
         cm = CallMenu.objects.filter(call__number__number=dial_number).first()
         tree = TreeNode(cm.audio_text)
-        # for cm in cms:
-        #     if node_start == 0:
-        #         tree = TreeNode(cm.audio_text)
-        #     cks = CallKey.objects.filter(next__id=cm.id)
-        #     for ck in cks:
+        cks = CallKey.objects.filter(menu=cm.id)
+        for ck in cks:
+            if ck.next:
+                child = TreeNode(ck.next.audio_text)
+                tree.children.append(child)
         #     tree = TreeNode('Parent')
         #     tree.children.append(TreeNode('Child 1'))
         #     child2 = TreeNode('Child 2')
