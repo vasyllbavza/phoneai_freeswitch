@@ -104,7 +104,8 @@ class MakeCallView(APIView):
                 call.save()
                 call_id = call.id
 
-        call_menu_id = 0
+        call_menu_id = 21
+
         cmd = 'bgapi'
         phonenumber_info = "is_new_call=%s,phoneai_number_id=%s,phoneai_call_id=%s,call_menu_id=%s" % (str(is_new_call),str(number.id),str(call_id), str(call_menu_id))
         callParams = "{%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (phonenumber_info,caller_id,call_uuid)

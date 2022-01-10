@@ -67,6 +67,7 @@ def get_header(event,header_name):
 def fs_send_dtmf(conn, uuid, dtmf):
     cmd = 'bgapi'
     args = f"uuid_send_dtmf {uuid} {dtmf}"
+    logger.info(args)
     ev = conn.api(str(cmd),str(args))
     fs_result = ''
     if ev:
@@ -206,6 +207,23 @@ try:
                                         menu = CallMenu(call=call)
                                         menu.save()
                                         fs_set_var(con, call_uuid,"call_menu_id", menu.id)
+                                        logger.info(f"new menu started.")
+                                    else:
+                                        dtmf = ""
+                                        cm = CallMenu.objects.get(pk=call_menu_id)
+                                        firstmenu = CallMenu.objects.filter(call__number__id=cm.call.number.id).first()
+                                        loop_count = 1
+                                        while firstmenu.id != call_menu_id and loop_count < 10:
+                                            ck = CallKey.objects.filter(next__id=call_menu_id).first()
+                                            if ck:
+                                                if dtmf == "":
+                                                    dtmf += '%s' % ck.keys
+                                                else:
+                                                    dtmf += 'WWW%s' % ck.keys
+                                            loop_count = loop_count + 1
+
+                                        logger.info(f"sending dtmf {dtmf}")
+                                        fs_send_dtmf(con, call_uuid, dtmf)
 
                             except:
                                 logger.exception("CallLog save error!!")
