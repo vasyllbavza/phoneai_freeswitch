@@ -1,9 +1,9 @@
 class TreeNode(dict):
-    def __init__(self, data, children=None):
+    def __init__(self, data, children=None, key = None):
         super().__init__()
         self.__dict__ = self
         self.data = data
-        # self.child = []
+        self.key = key
         self.children = list(children) if children is not None else []
 
     def insert(self, obj):
@@ -13,7 +13,7 @@ class TreeNode(dict):
     @staticmethod
     def from_dict(dict_):
         """ Recursively (re)construct TreeNode-based tree from dictionary. """
-        node = Tree(dict_['name'], dict_['children'])
+        node = TreeNode(dict_['name'], dict_['key'], dict_['children'])
 #        node.children = [TreeNode.from_dict(child) for child in node.children]
-        node.children = list(map(Tree.from_dict, node.children))
+        node.children = list(map(TreeNode.from_dict, node.children))
         return node

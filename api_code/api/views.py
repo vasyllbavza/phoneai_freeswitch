@@ -160,7 +160,10 @@ class ShowCallMenu(APIView):
         cks = CallKey.objects.filter(menu=cm.id)
         for ck in cks:
             if ck.next:
-                child = TreeNode(ck.next.audio_text)
+                child = TreeNode(ck.next.audio_text, None, ck.keys)
+                tree.children.append(child)
+            else:
+                child = TreeNode("", None, ck.keys)
                 tree.children.append(child)
         #     tree = TreeNode('Parent')
         #     tree.children.append(TreeNode('Child 1'))
