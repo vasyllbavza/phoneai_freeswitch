@@ -185,6 +185,7 @@ if (session:ready()) then
 
                 if key_collected ~= "" then
                     freeswitch.consoleLog("info", "silence_detected event triggering.\n");
+                    evtdata["key_collected"] = "1";
                     evtdata["audio_text"] = speech_found;
                     evtdata["record_uuid"] = record_uuid;
                     session:execute("stop_record_session",recordfile);
@@ -197,6 +198,9 @@ if (session:ready()) then
                     mydtbd_send_event(evtdata);
                     wait_time_missed = 0;
                 else
+                    evtdata["key_collected"] = "0";
+                    evtdata["audio_text"] = speech_found;
+                    mydtbd_send_event(evtdata);
                     freeswitch.consoleLog("ERR", "silence_detected with no key collected\n");
                     wait_time_missed = wait_time_missed + 1;
                     freeswitch.consoleLog("INFO", "wait_time_missed= "..wait_time_missed.."\n");
