@@ -28,7 +28,8 @@ from api.views import (
     HelloView,
     MakeCallView,
     ScanCallView,
-    ShowCallMenu
+    ShowCallMenu,
+    PhonenumberView
 )
 from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -60,6 +61,7 @@ urlpatterns = [
     path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # path('status/'), FreeswitchStatus.as_view()),
     path('api/hello/', HelloView.as_view(), name='hello'),
+    path('api/phonenumber/',PhonenumberView.as_view()),
     path('api/makecall/',MakeCallView.as_view()),
     path('api/scan/',ScanCallView.as_view()),
     path('api/callmenu/',ShowCallMenu.as_view()),

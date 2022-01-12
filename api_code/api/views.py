@@ -19,7 +19,10 @@ from api.models import (
     PhoneNumber,
 )
 from api.utils import TreeNode
-from api.serializer import CallLogSerializer
+from api.serializer import (
+    CallLogSerializer,
+    PhonenumberSerializer
+)
 
 from phoneai_api import settings
 
@@ -182,3 +185,19 @@ class ShowCallMenu(APIView):
         content["menu"] = tree
         return Response(content)
 
+class PhonenumberView(APIView):
+
+    def post(self,request,format=None):
+
+        content = {}
+
+        dial_number = request.query_params.get('number','')
+        business_name = request.query_params.get('business_name','')
+
+        number, isnew = PhoneNumber.objects.get_or_create(number=dial_number)
+        if business_name:
+            number.business_name = business_name
+        number.save()
+
+        serializer = PhonenumberSerializer(number)
+        return Response(serializer.data)
