@@ -200,7 +200,14 @@ if (session:ready()) then
                 else
                     evtdata["key_collected"] = "0";
                     evtdata["audio_text"] = speech_found;
+                    evtdata["record_uuid"] = record_uuid;
+                    session:execute("stop_record_session",recordfile);
+                    record_uuid = api:execute("create_uuid","");
+                    recordfile = record_base..record_uuid..".wav";
+                    session:execute("record_session",recordfile);
+
                     mydtbd_send_event(evtdata);
+
                     freeswitch.consoleLog("ERR", "silence_detected with no key collected\n");
                     wait_time_missed = wait_time_missed + 1;
                     freeswitch.consoleLog("INFO", "wait_time_missed= "..wait_time_missed.."\n");
