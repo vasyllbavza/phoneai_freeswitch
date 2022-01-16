@@ -25,7 +25,7 @@ class PhoneNumberAdmin(admin.ModelAdmin):
 admin.site.register(PhoneNumber, PhoneNumberAdmin)
 
 class CallLogAdmin(admin.ModelAdmin):
-    list_display = ('id', 'number', 'uuid', 'status', 'created_at', 'updated_at','hangup_link')
+    list_display = ('id', 'number', 'uuid', 'status', 'created_at', 'updated_at','hangup_link','dtmf_link',)
 
     actions = ['hangup_call']
 
@@ -48,6 +48,39 @@ class CallLogAdmin(admin.ModelAdmin):
     hangup_link.short_description = 'Hangup Call'
     hangup_link.allow_tags = True
 
+    def dtmf_link(self, obj):
+        if obj.status == CallStatus.CALLING or obj.status == CallStatus.ANSWERED:
+            return format_html(
+                '<a class="button" href="{}">1</a>&nbsp;\
+                 <a class="button" href="{}">2</a>&nbsp;\
+                 <a class="button" href="{}">3</a>&nbsp;\
+                 <a class="button" href="{}">4</a>&nbsp;<br>\
+                 <a class="button" href="{}">5</a>&nbsp;\
+                 <a class="button" href="{}">6</a>&nbsp;\
+                 <a class="button" href="{}">7</a>&nbsp;\
+                 <a class="button" href="{}">8</a>&nbsp;<br>\
+                 <a class="button" href="{}">*</a>&nbsp;\
+                 <a class="button" href="{}">9</a>&nbsp;\
+                 <a class="button" href="{}">0</a>&nbsp;\
+                 <a class="button" href="{}">#</a>&nbsp;',
+                reverse('admin:dtmf-action', args=[obj.pk,1]),
+                reverse('admin:dtmf-action', args=[obj.pk,2]),
+                reverse('admin:dtmf-action', args=[obj.pk,3]),
+                reverse('admin:dtmf-action', args=[obj.pk,4]),
+                reverse('admin:dtmf-action', args=[obj.pk,5]),
+                reverse('admin:dtmf-action', args=[obj.pk,6]),
+                reverse('admin:dtmf-action', args=[obj.pk,7]),
+                reverse('admin:dtmf-action', args=[obj.pk,8]),
+                reverse('admin:dtmf-action', args=[obj.pk,10]),
+                reverse('admin:dtmf-action', args=[obj.pk,9]),
+                reverse('admin:dtmf-action', args=[obj.pk,0]),
+                reverse('admin:dtmf-action', args=[obj.pk,11]),
+            )
+        return ""
+
+    dtmf_link.short_description = 'DTMF'
+    dtmf_link.allow_tags = True
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -55,6 +88,11 @@ class CallLogAdmin(admin.ModelAdmin):
                 r'^hangup_call_action/(?P<pk>\d+)/$',
                 self.admin_site.admin_view(self.hangup_view),
                 name='hangup-call',
+            ),
+            url(
+                r'^dtmf_action/(?P<pk>\d+)/(?P<dtmf>\d+)/$',
+                self.admin_site.admin_view(self.dtmf_view),
+                name='dtmf-action',
             ),
         ]
         return custom_urls + urls
@@ -64,6 +102,21 @@ class CallLogAdmin(admin.ModelAdmin):
         obj = get_object_or_404(CallLog, pk=pk)
         cmd = 'bgapi'
         args = f"uuid_kill {obj.uuid}"
+        result = freeswitch_execute(cmd,args)
+        print(result)
+        print(args)
+        return redirect('/api/admin/api/calllog/')
+
+    def dtmf_view(self, request, pk, dtmf):
+        obj = get_object_or_404(CallLog, pk=pk)
+        cmd = 'bgapi'
+        if dtmf == 10:
+            args = f"uuid_send_dtmf {obj.uuid} *"
+        elif dtmf == 11:
+            args = f"uuid_send_dtmf {obj.uuid} #"
+        else:
+            args = f"uuid_send_dtmf {obj.uuid} {dtmf}"
+
         result = freeswitch_execute(cmd,args)
         print(result)
         print(args)
