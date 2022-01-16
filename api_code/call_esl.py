@@ -109,7 +109,7 @@ logger.info(" [x] Starting.....OK")
 
 try:
 
-    con.events('plain', 'HEARTBEAT CUSTOM mydtbd::info')
+    con.events('plain', 'HEARTBEAT TALK NOTALK DETECTED_SPEECH CUSTOM mydtbd::info')
 
     idle_count = 0
     hb_count = 0
@@ -129,7 +129,7 @@ try:
 
                 event_time = "%sZ" % datetime.datetime.utcnow().replace(microsecond=0).isoformat()
                 myDate = datetime.datetime.now()
-
+                logger.info(f"{event_name} {event_time}")
                 if event_name == "HEARTBEAT":
                     event_info = get_header(e,"Event-Info")
                     up_time = get_header(e,"Up-Time")
@@ -142,6 +142,13 @@ try:
                     callinfo['message'] = event_info
                     key = "system.heartbeat.message"
                     data = json.dumps(callinfo)
+
+                if event_name == "DETECTED_SPEECH":
+                    print(e.serialize())
+                if event_name == "TALK":
+                    print(e.serialize())
+                if event_name == "NOTALK":
+                    print(e.serialize())
 
                 if event_name == "CUSTOM":
                     
@@ -162,6 +169,7 @@ try:
                         logger.info(f"{event_action} {call_id}")
                         # debug
                         # call_id = 1
+                        # number_id = 4
                         # if event_action == "call_keys":
                         #     try:
                         #         call = CallLog.objects.get(pk=call_id)
@@ -188,7 +196,7 @@ try:
                         #         logger.error("callkey save error!!")
 
                         if event_action == "call_started":
-                            print(e.serialize())
+                            # print(e.serialize())
                             try:
                                 number = PhoneNumber.objects.get(pk=number_id)
                                 number.attempt = number.attempt + 1
@@ -240,6 +248,23 @@ try:
                                 logger.exception("CallLog save error!!")
 
                         if event_action == "call_ended":
+                            print(e.serialize())
+                            record_uuid = get_header(e, "record_uuid")
+                            record_uuid = "%s.wav" % record_uuid
+                            audio_text = get_header(e, "audio_text")
+
+                            logger.info( f"{record_uuid} {audio_text}" )
+
+                            if audio_text != "":
+                                if call_menu_id:
+                                    callmenu = CallMenu.objects.get(pk=call_menu_id)
+                                    callmenu.audio_file = record_uuid
+                                    callmenu.audio_text = audio_text
+                                    callmenu.save()
+                                else:
+                                    callmenu = CallMenu(call_id=call_id, audio_file = record_uuid, audio_text = audio_text)
+                                    callmenu.save()
+
                             try:
                                 call = CallLog.objects.get(pk=call_id)
                                 call.status = CallStatus.PROCESSED
@@ -253,10 +278,10 @@ try:
                                 key_parent = get_header(e, "key_parent")
                                 key_level = get_header(e, "key_level")
                                 call_keys = get_header(e, "param3")
-                                call_menu_id = get_header(e, "call_menu_id")
                                 record_uuid = get_header(e, "record_uuid")
                                 record_uuid = "%s.wav" % record_uuid
                                 audio_text = get_header(e, "audio_text")
+                                key_collected = get_header(e, "key_collected")
                                 if call_menu_id:
                                     callmenu = CallMenu.objects.get(pk=call_menu_id)
                                     callmenu.audio_file = record_uuid
@@ -290,6 +315,10 @@ try:
                                 #     logger.info("key_parent is missing")
 
                                 logger.info("silence_detected")
+                                if key_collected == "0":
+                                    logger.info("no key collected. wait for next")
+                                    continue
+
                                 ckeys = CallKey.objects.filter(menu=callmenu,processed=0).order_by('id')
                                 if len(ckeys) > 0:
                                     ckey = ckeys[0]

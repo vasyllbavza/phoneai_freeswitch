@@ -1,4 +1,5 @@
-FROM --platform=linux/x86_64 python:3.6-buster
+# FROM --platform=linux/x86_64 python:3.6-buster
+FROM --platform=linux/x86_64 python:3.9-bullseye
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
