@@ -235,7 +235,7 @@ try:
                                         ck_next = CallKey.objects.filter(next__isnull=True,menu=cm).first()
                                         if ck_next:
                                             dtmf = ck_next.keys
-                                        fs_set_var(con, call_uuid,"key_target", ck_next.keys)
+                                        fs_set_var(con, call_uuid,"key_target", dtmf)
 
                                         # cm_new = CallMenu(call_id=call_id, audio_file = "", audio_text = "")
                                         # cm_new.save()
