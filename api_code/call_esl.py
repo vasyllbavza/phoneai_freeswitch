@@ -256,7 +256,7 @@ try:
                             logger.info( f"{record_uuid} {audio_text}" )
 
                             if audio_text != "":
-                                if call_menu_id:
+                                if call_menu_id and call_menu_id != "" and call_menu_id != "0":
                                     callmenu = CallMenu.objects.get(pk=call_menu_id)
                                     callmenu.audio_file = record_uuid
                                     callmenu.audio_text = audio_text
