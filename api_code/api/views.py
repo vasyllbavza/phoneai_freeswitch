@@ -154,6 +154,24 @@ class ScanCallView(APIView, LimitOffsetPagination):
 
         return self.get_paginated_response(serializer.data)
 
+def menu_target_keys(menu_id):
+
+    cm = CallMenu.objects.get(pk=menu_id)
+    current_menu_id = menu_id
+    firstmenu = CallMenu.objects.filter(call__number__id=cm.call.number.id).first()
+    loop_count = 1
+    dtmf = ""
+    while firstmenu.id != current_menu_id and loop_count < 10:
+        ck = CallKey.objects.filter(next__id=current_menu_id).first()
+        if ck:
+            if dtmf == "":
+                dtmf += '%s' % ck.keys
+            else:
+                dtmf += ',%s' % ck.keys
+            current_menu_id = ck.menu.id
+        loop_count = loop_count + 1
+    return dtmf
+
 def make_tree(cm_id, child, key):
 
     tree = None
@@ -163,11 +181,12 @@ def make_tree(cm_id, child, key):
         cks = CallKey.objects.filter(menu=cm.id)
         for ck in cks:
             if ck.next:
-                child = make_tree(ck.next.id, None, ck.keys)
+                # child = make_tree(ck.next.id, None, ck.keys)
+                child = make_tree(ck.next.id, None, menu_target_keys(ck.next.id))
                 tree.children.append(child)
-            else:
-                child = TreeNode("", None, ck.keys)
-                tree.children.append(child)
+            # else:
+            #     child = TreeNode("", None, ck.keys)
+            #     tree.children.append(child)
     return tree
 
 class ShowCallMenu(APIView):
@@ -178,6 +197,13 @@ class ShowCallMenu(APIView):
 
         content = {}
         content['status'] = 'success'
+
+        content['number'] = dial_number
+        number = PhoneNumber.objects.get(number=dial_number)
+        content['number'] = number.business_name
+        content['attempt'] = number.attempt
+        content['completed'] = number.completed
+
         node_start = 0
         cm = CallMenu.objects.filter(call__number__number=dial_number).first()
 
