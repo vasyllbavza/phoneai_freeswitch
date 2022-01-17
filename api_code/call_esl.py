@@ -328,7 +328,7 @@ try:
                                     logger.info("no key collected. wait for next")
                                     continue
 
-                                ckeys = CallKey.objects.filter(menu=callmenu,processed=0).order_by('id')
+                                ckeys = CallKey.objects.filter(menu=callmenu,next__isnull=True).order_by('id')
                                 if len(ckeys) > 0:
                                     ckey = ckeys[0]
                                     logger.info( f"sending DTMF [{ckey.keys}] to {call_id}, {call_uuid}")
@@ -341,6 +341,10 @@ try:
 
                                     ckey.next = menu
                                     ckey.save()
+
+                                    if len(ckeys) == 1:
+                                        menu.completed = True
+                                        menu.save()
 
                                     fs_set_var(con, call_uuid, "call_menu_id", call_menu_id)
 

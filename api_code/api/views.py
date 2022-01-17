@@ -108,7 +108,7 @@ class MakeCallView(APIView):
                 call.save()
                 call_id = call.id
 
-            firstmenu = CallMenu.objects.filter(call__number__number=number).first()
+            firstmenu = CallMenu.objects.filter(call__number__number=number, completed=False).first()
             if firstmenu:
                 call_menu_id = firstmenu.id
 
