@@ -154,6 +154,22 @@ class ScanCallView(APIView, LimitOffsetPagination):
 
         return self.get_paginated_response(serializer.data)
 
+def make_tree(cm_id, child, key):
+
+    tree = None
+    cm = CallMenu.objects.get(pk=cm_id)
+    if cm:
+        tree = TreeNode(cm.audio_text,child, key)
+        cks = CallKey.objects.filter(menu=cm.id)
+        for ck in cks:
+            if ck.next:
+                child = make_tree(ck.next.id, None, ck.keys)
+                tree.children.append(child)
+            else:
+                child = TreeNode("", None, ck.keys)
+                tree.children.append(child)
+    return tree
+
 class ShowCallMenu(APIView):
 
     def get(self, request, format=None):
@@ -164,21 +180,8 @@ class ShowCallMenu(APIView):
         content['status'] = 'success'
         node_start = 0
         cm = CallMenu.objects.filter(call__number__number=dial_number).first()
-        tree = TreeNode(cm.audio_text)
-        cks = CallKey.objects.filter(menu=cm.id)
-        for ck in cks:
-            if ck.next:
-                child = TreeNode(ck.next.audio_text, None, ck.keys)
-                tree.children.append(child)
-            else:
-                child = TreeNode("", None, ck.keys)
-                tree.children.append(child)
-        #     tree = TreeNode('Parent')
-        #     tree.children.append(TreeNode('Child 1'))
-        #     child2 = TreeNode('Child 2')
-        #     tree.children.append(child2)
-        #     child2.children.append(TreeNode('Grand Kid'))
-        #     child2.children[0].children.append(TreeNode('Great Grand Kid'))
+
+        tree = make_tree(cm.id, None, '')
 
         json_str = json.dumps(tree, indent=2)
         print(json_str)
