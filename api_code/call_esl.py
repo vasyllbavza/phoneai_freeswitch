@@ -227,22 +227,24 @@ try:
                                                 if dtmf == "":
                                                     dtmf += '%s' % ck.keys
                                                 else:
-                                                    dtmf += 'WWW%s' % ck.keys
+                                                    dtmf += '%s' % ck.keys
                                             loop_count = loop_count + 1
 
+                                        fs_set_var(con, call_uuid,"key_travel", dtmf)
+                                        dtmf = ""
                                         ck_next = CallKey.objects.filter(next__isnull=True,menu=cm).first()
-                                        if dtmf == "":
+                                        if ck_next:
                                             dtmf = ck_next.keys
-                                        else:
-                                            dtmf += "WWW%s" % ck_next.keys
-                                        cm_new = CallMenu(call_id=call_id, audio_file = "", audio_text = "")
-                                        cm_new.save()
-                                        ck_next.next = cm_new
-                                        ck_next.save()
-                                        fs_set_var(con, call_uuid,"call_menu_id", cm_new.id)
-                                        logger.info(f"new menu [{cm_new.id}] started. ")
-                                        logger.info(f"sending dtmf {dtmf}")
-                                        fs_send_dtmf(con, call_uuid, dtmf)
+                                        fs_set_var(con, call_uuid,"key_target", ck_next.keys)
+
+                                        # cm_new = CallMenu(call_id=call_id, audio_file = "", audio_text = "")
+                                        # cm_new.save()
+                                        # ck_next.next = cm_new
+                                        # ck_next.save()
+                                        # fs_set_var(con, call_uuid,"call_menu_id", cm_new.id)
+                                        # logger.info(f"new menu [{cm_new.id}] started. ")
+                                        # logger.info(f"sending dtmf {dtmf}")
+                                        # fs_send_dtmf(con, call_uuid, dtmf)
 
                             except:
                                 logger.exception("CallLog save error!!")
