@@ -228,6 +228,7 @@ try:
                                                     dtmf += '%s' % ck.keys
                                                 else:
                                                     dtmf += '%s' % ck.keys
+                                                call_menu_id = ck.menu.id
                                             loop_count = loop_count + 1
 
                                         fs_set_var(con, call_uuid,"key_travel", dtmf)
