@@ -343,8 +343,8 @@ try:
                                     ckey.save()
 
                                     if len(ckeys) == 1:
-                                        menu.completed = True
-                                        menu.save()
+                                        callmenu.completed = True
+                                        callmenu.save()
 
                                     fs_set_var(con, call_uuid, "call_menu_id", call_menu_id)
 
