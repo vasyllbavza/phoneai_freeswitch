@@ -170,7 +170,7 @@ def menu_target_keys(menu_id):
                 dtmf += ',%s' % ck.keys
             current_menu_id = ck.menu.id
         loop_count = loop_count + 1
-    return dtmf
+    return dtmf[::-1]
 
 def make_tree(cm_id, child, key):
 
