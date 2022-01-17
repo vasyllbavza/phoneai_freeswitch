@@ -18,7 +18,7 @@ class PhoneNumber(models.Model):
     business_name = models.TextField(null=True, blank=True)
 
     attempt = models.IntegerField(default=0)
-
+    completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
@@ -58,6 +58,8 @@ class CallMenu(models.Model):
                         ext_whitelist=(".mp3", ".wav", ".ogg"),
                         help_text=("Allowed type - .mp3, .wav, .ogg"))
     audio_text = models.TextField(null=True, blank=True)
+
+    completed = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)

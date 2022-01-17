@@ -253,6 +253,8 @@ try:
                             record_uuid = "%s.wav" % record_uuid
                             audio_text = get_header(e, "audio_text")
 
+                            force_hangup = get_header(e, "force_hangup")
+
                             logger.info( f"{record_uuid} {audio_text}" )
 
                             if audio_text != "":
@@ -264,13 +266,20 @@ try:
                                 else:
                                     callmenu = CallMenu(call_id=call_id, audio_file = record_uuid, audio_text = audio_text)
                                     callmenu.save()
-
+                                if force_hangup and force_hangup == "1":
+                                    callmenu.completed = True
+                                    callmenu.save()
                             try:
                                 call = CallLog.objects.get(pk=call_id)
                                 call.status = CallStatus.PROCESSED
                                 call.save()
+
+                                if force_hangup and force_hangup == "1":
+                                    call.number.completed = True
+                                    call.number.save()
                             except:
                                 logger.error("CallLog save error!!")
+
 
                         if event_action == "silence_detected":
                             print(e.serialize())
