@@ -15,7 +15,7 @@ from api.models import (
 from api.views import freeswitch_execute
 
 class PhoneNumberAdmin(admin.ModelAdmin):
-    list_display = ('id', 'number', 'business_name' ,'attempt', 'created_at', 'updated_at')
+    list_display = ('id', 'number', 'business_name' ,'attempt', 'completed', 'created_at', 'updated_at')
     list_filter = [
         "attempt",
         "created_at",
@@ -161,7 +161,7 @@ class CallMenuAdmin(admin.ModelAdmin):
     routekeys.allow_tags = True
 
 
-    list_display = ('id', 'call', 'audio_file', 'audio_file_player', 'audio_text', keys, routekeys, 'created_at', 'updated_at')
+    list_display = ('id', 'call', 'completed', 'audio_file', 'audio_file_player', 'audio_text', keys, routekeys, 'created_at', 'updated_at')
     # list_filter = [
     #     "call",
     #     "created_at",
