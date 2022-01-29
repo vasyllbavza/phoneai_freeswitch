@@ -22,6 +22,9 @@ class PhoneNumber(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
+    retry_auto = models.IntegerField(default=0)
+    max_attempt = models.IntegerField(default=10)
+
     class Meta:
         db_table = 'phone_numbers'
         managed = True
