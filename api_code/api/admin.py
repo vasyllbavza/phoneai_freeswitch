@@ -15,10 +15,11 @@ from api.models import (
 from api.views import freeswitch_execute
 
 class PhoneNumberAdmin(admin.ModelAdmin):
-    list_display = ('id', 'number', 'business_name' ,'attempt', 'completed', 'created_at', 'updated_at')
+    list_display = ('id', 'number', 'business_name' ,'attempt', 'completed', 'retry_auto', 'max_attempt', 'created_at', 'updated_at')
     list_filter = [
         "attempt",
         "created_at",
+        "retry_auto",
     ]
     search_fields = ['number', 'business_name']
 
