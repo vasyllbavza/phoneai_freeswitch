@@ -106,7 +106,7 @@ def findKeys(audio_text):
     from urllib.parse import unquote
     audio_text = unquote(audio_text)
     audio_text = audio_text.strip()
-    ret = [s for s in audio_text.split() if isNumber(s)]
+    ret = [isNumber(s) for s in audio_text.split() if isNumber(s)]
     return ret
 
 con = ESL.ESLconnection(settings.ESL_HOSTNAME, settings.ESL_PORT, settings.ESL_SECRET)
