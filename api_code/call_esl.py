@@ -95,6 +95,20 @@ def fs_set_var(conn, uuid, var, val):
             return True
     return False
 
+def isNumber(str):
+    from word2number import w2n
+    try:
+        return w2n.word_to_num(str)
+    except:
+        return False
+
+def findKeys(audio_text):
+    from urllib.parse import unquote
+    audio_text = unquote(audio_text)
+    audio_text = audio_text.strip()
+    ret = [s for s in audio_text.split() if isNumber(s)]
+    return ret
+
 con = ESL.ESLconnection(settings.ESL_HOSTNAME, settings.ESL_PORT, settings.ESL_SECRET)
 print("[x] Starting..")
 
@@ -129,7 +143,7 @@ try:
 
                 event_time = "%sZ" % datetime.datetime.utcnow().replace(microsecond=0).isoformat()
                 myDate = datetime.datetime.now()
-                logger.info(f"{event_name} {event_time}")
+                # logger.debug(f"{event_name} {event_time}")
                 if event_name == "HEARTBEAT":
                     event_info = get_header(e,"Event-Info")
                     up_time = get_header(e,"Up-Time")
@@ -304,7 +318,8 @@ try:
                                     callmenu.save()
                                 try:
                                     if event_keys:
-                                        kk = event_keys.split(",")
+                                        # kk = event_keys.split(",")
+                                        kk = findKeys(audio_text)
                                         for k in kk:
                                             if k:
                                                 try:
