@@ -266,6 +266,22 @@ try:
                             except:
                                 logger.exception("CallLog save error!!")
 
+                        if event_action == "key_pressed":
+                            call_menu_id = get_header(e, "call_menu_id")
+                            current_menu_id = get_header(e, "current_menu_id")
+                            # event_keys, call_uuid
+                            try:
+                                ck = CallKey.objects.get(menu__id=current_menu_id, keys=event_keys)
+                                if ck.next:
+                                    current_menu_id = ck.next.id
+                                else:
+                                    menu = CallMenu(call_id=call_id)
+                                    menu.save()
+                                    current_menu_id = menu.id
+                            except:
+                                pass
+                            fs_set_var(con, call_uuid,"current_menu_id", current_menu_id)
+
                         if event_action == "call_ended":
                             print(e.serialize())
                             record_uuid = get_header(e, "record_uuid")
