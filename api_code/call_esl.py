@@ -230,10 +230,12 @@ try:
                                         menu.save()
                                         fs_set_var(con, call_uuid,"call_menu_id", menu.id)
                                         logger.info(f"new menu started.")
+                                        fs_set_var(con, call_uuid,"current_menu_id", menu.id)
                                     else:
                                         dtmf = ""
                                         cm = CallMenu.objects.get(pk=call_menu_id)
                                         firstmenu = CallMenu.objects.filter(call__number__id=cm.call.number.id).first()
+                                        fs_set_var(con, call_uuid,"current_menu_id", firstmenu.id)
                                         loop_count = 1
                                         while firstmenu.id != call_menu_id and loop_count < 10:
                                             ck = CallKey.objects.filter(next__id=call_menu_id).first()
