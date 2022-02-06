@@ -138,5 +138,6 @@ def get_phonenumber_for_retry():
         call.status = CallStatus.CALLING
         call.save()
 
-
+logger.info("call-retry: starting...")
 get_phonenumber_for_retry()
+logger.info("call-retry: finishing..")
