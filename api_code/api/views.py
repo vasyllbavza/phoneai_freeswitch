@@ -111,6 +111,14 @@ class MakeCallView(APIView):
             firstmenu = CallMenu.objects.filter(call__number=number, completed=False).first()
             if firstmenu:
                 call_menu_id = firstmenu.id
+            else:
+                call.number.completed = True
+                call.number.save()
+
+                content['status'] = "fail"
+                content['message'] = "crawl is completed already"
+                content['fs_output'] = ""
+                return Response(content)
 
         cmd = 'bgapi'
         phonenumber_info = "is_new_call=%s,phoneai_number_id=%s,phoneai_call_id=%s,call_menu_id=%s" % (str(is_new_call),str(number.id),str(call_id), str(call_menu_id))
