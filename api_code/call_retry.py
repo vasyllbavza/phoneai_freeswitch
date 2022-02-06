@@ -109,10 +109,8 @@ def get_phonenumber_for_retry():
             call.save()
             call_id = call.id
         else:
-            call = CallLog(number=number,status=CallStatus.PENDING)
-            call.uuid = call_uuid
-            call.save()
-            call_id = call.id
+            logger.info("this # %s is call-in-progress. ignoring this." % number.number)
+            continue
 
         firstmenu = CallMenu.objects.filter(call__number=number, completed=False).first()
         if firstmenu:
