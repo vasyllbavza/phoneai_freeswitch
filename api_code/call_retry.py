@@ -100,6 +100,13 @@ def get_phonenumber_for_retry():
     numbers = PhoneNumber.objects.filter(completed=False, retry_auto=True)
     for number in numbers:
         logger.info("looking for this # %s" % number.number)
+
+        if number.attempt >= number.max_attempt:
+            logger.info("this # %s exceed the max retry limit[%s]" % (number.number, str(number.max_attempt)))
+            number.retry_auto = 0
+            number.save()
+            continue
+
         call_menu_id = 0
         call_uuid = str(uuid.uuid4())
         call = CallLog.objects.filter(number=number, status=CallStatus.PROCESSED).order_by('-id').first()
