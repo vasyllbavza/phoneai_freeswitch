@@ -83,6 +83,7 @@ class MakeCallView(APIView):
         number, isnew = PhoneNumber.objects.get_or_create(number=dial_number)
         if business_name:
             number.business_name = business_name
+        number.retry_auto = 1
         number.save()
 
         call_menu_id = 0
