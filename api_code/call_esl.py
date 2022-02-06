@@ -304,6 +304,15 @@ try:
                                 if force_hangup and force_hangup == "1":
                                     callmenu.completed = True
                                     callmenu.save()
+                                else:
+                                    try:
+                                        if audio_text and audio_text != "":
+                                            kk = findKeys(audio_text)
+                                            if len(kk) == 0:
+                                                callmenu.completed = True
+                                                callmenu.save()
+                                    except:
+                                        pass
                             try:
                                 call = CallLog.objects.get(pk=call_id)
                                 call.status = CallStatus.PROCESSED
