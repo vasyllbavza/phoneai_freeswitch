@@ -85,7 +85,7 @@ class MakeCallView(APIView):
             number.business_name = business_name
         number.retry_auto = 1
         number.save()
-
+        is_new_call = "0"
         call_menu_id = 0
         call_uuid = str(uuid.uuid4())
         if is_new_call == "1":
