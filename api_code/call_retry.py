@@ -99,6 +99,7 @@ def get_phonenumber_for_retry():
     caller_id = '14582037530'
     numbers = PhoneNumber.objects.filter(completed=False, retry_auto=True)
     for number in numbers:
+        logger.info("looking for this # %s" % number.number)
         call_menu_id = 0
         call_uuid = str(uuid.uuid4())
         call = CallLog.objects.filter(number=number, status=CallStatus.PROCESSED).order_by('-id').first()
@@ -121,13 +122,14 @@ def get_phonenumber_for_retry():
             if menu_completed:
                 call.number.completed = True
                 call.number.save()
+                logger.info("this number is completed crawling. ignoring this.")
                 continue
 
         cmd = 'bgapi'
         phonenumber_info = "is_new_call=0,phoneai_number_id=%s,phoneai_call_id=%s,call_menu_id=%s" % (str(number.id),str(call_id), str(call_menu_id))
         callParams = "{%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (phonenumber_info,caller_id,call_uuid)
         args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai.lua)" %(callParams,number.number)
-        print( "%s %s" %(cmd,args) )
+        logger.info( "%s %s" %(cmd,args) )
         result = freeswitch_execute(cmd,args)
         if result['status'] < 1:
             logger.error("error: %s" % result['message'])
