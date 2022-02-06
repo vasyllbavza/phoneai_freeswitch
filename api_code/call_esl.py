@@ -318,9 +318,18 @@ try:
                                 call.status = CallStatus.PROCESSED
                                 call.save()
 
-                                if force_hangup and force_hangup == "1":
+                                # if force_hangup and force_hangup == "1":
+                                #     call.number.completed = True
+                                #     call.number.save()
+
+                                # find if number have completed all menu/submenu
+                                pending_menu = CallMenu.objects.filter(call=call, completed=False).first()
+                                if pending_menu:
+                                    logger.info("need to crawl more")
+                                else:
                                     call.number.completed = True
                                     call.number.save()
+
                             except:
                                 logger.error("CallLog save error!!")
 
