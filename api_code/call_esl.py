@@ -326,7 +326,7 @@ try:
 
 
                         if event_action == "silence_detected":
-                            print(e.serialize())
+                            # print(e.serialize())
                             try:
                                 key_parent = get_header(e, "key_parent")
                                 key_level = get_header(e, "key_level")
