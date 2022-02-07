@@ -128,7 +128,7 @@ admin.site.register(CallLog, CallLogAdmin)
 class CallKeyAdmin(admin.ModelAdmin):
     list_display = ('id', 'menu', 'keys', 'audio_text', 'next', 'created_at', 'updated_at')
     list_filter = [
-        "menu__number",
+        "menu",
         "created_at",
     ]
 
