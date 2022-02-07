@@ -18,6 +18,13 @@ app.conf.broker_url = settings.REDIS_BROKER
 logging.basicConfig(filename='/var/log/transcribe.log', level=logging.INFO)
 logger = logging.getLogger()
 
+from api.models import (
+    PhoneNumber,
+    CallLog,
+    CallMenu,
+    CallKey,
+    CallStatus
+)
 
 @app.task
 def add(x, y):
@@ -49,6 +56,7 @@ class MyRecognizeCallback(RecognizeCallback):
 
     def set_data(self, vm_data):
         self.vm_data = vm_data
+        self.menu_data = []
 
     def on_data(self, data):
 
@@ -71,14 +79,34 @@ class MyRecognizeCallback(RecognizeCallback):
                             else:
                                 if part[1] > speech_stop:
                                     print(speech)
+                                    ck = findKeys(speech)
+                                    if len(ck) == 1:
+                                        submenu_info = {}
+                                        submenu_info['key'] = ck[0]
+                                        submenu_info['text'] = speech
+                                        self.menu_data.add(submenu_info)
                                     speech = ''
                                     speech_stop = 0
                                 else:
                                     speech = "%s %s" %(speech,part[0])
                                     speech_stop = part[2]
                         print(speech)
+                        if len(speech) > 0:
+                            ck = findKeys(speech)
+                            if len(ck) == 1:
+                                submenu_info = {}
+                                submenu_info['key'] = ck[0]
+                                submenu_info['text'] = speech
+                                self.menu_data.add(submenu_info)
+
                     else:
                         print(parts['transcript'])
+                        if len(keys) == 1:
+                            submenu_info = {}
+                            submenu_info['key'] = keys[0]
+                            submenu_info['text'] = parts['transcript']
+                            self.menu_data.add(submenu_info)
+        log(json.dumps(self.menu_data))
 
     def on_error(self, error):
         log('Error received: {}'.format(error))

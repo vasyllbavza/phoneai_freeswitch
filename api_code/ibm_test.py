@@ -103,5 +103,6 @@ from tasks import process_menu_audio
 
 data = {}
 data['RecordingFile'] = '/var/lib/freeswitch/recordings/usermedia/3cd3ff62-874a-11ec-97f3-a593d3cd889e.wav'
+data['menu_id'] = 160
 
 process_menu_audio.delay(data)
