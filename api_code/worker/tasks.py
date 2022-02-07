@@ -84,7 +84,7 @@ class MyRecognizeCallback(RecognizeCallback):
                                         submenu_info = {}
                                         submenu_info['key'] = ck[0]
                                         submenu_info['text'] = speech
-                                        self.menu_data.add(submenu_info)
+                                        self.menu_data.append(submenu_info)
                                     speech = ''
                                     speech_stop = 0
                                 else:
@@ -97,7 +97,7 @@ class MyRecognizeCallback(RecognizeCallback):
                                 submenu_info = {}
                                 submenu_info['key'] = ck[0]
                                 submenu_info['text'] = speech
-                                self.menu_data.add(submenu_info)
+                                self.menu_data.append(submenu_info)
 
                     else:
                         print(parts['transcript'])
@@ -105,7 +105,7 @@ class MyRecognizeCallback(RecognizeCallback):
                             submenu_info = {}
                             submenu_info['key'] = keys[0]
                             submenu_info['text'] = parts['transcript']
-                            self.menu_data.add(submenu_info)
+                            self.menu_data.append(submenu_info)
         log(json.dumps(self.menu_data))
 
     def on_error(self, error):
