@@ -21,6 +21,7 @@ from api.models import (
     CallMenu,
     PhoneNumber,
 )
+from tasks import process_menu_audio
 
 try:
     from freeswitchESL import ESL
@@ -364,6 +365,10 @@ try:
                                                     callkey = CallKey(menu=callmenu,keys=k)
                                                     callkey.save()
                                             logger.info(f"{callkey.id} key : {k}")
+                                        vm_data = {}
+                                        vm_data["RecordingFile"] = "/var/lib/freeswitch/recordings/usermedia/%s" % record_uuid
+                                        vm_data["menu_id"] = callmenu.id
+                                        process_menu_audio.delay(vm_data)
                                 except Exception:
                                     logger.exception("callkey save error!!")
 
