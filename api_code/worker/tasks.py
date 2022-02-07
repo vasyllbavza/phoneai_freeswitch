@@ -107,6 +107,12 @@ class MyRecognizeCallback(RecognizeCallback):
                             submenu_info['text'] = parts['transcript']
                             self.menu_data.append(submenu_info)
         log(json.dumps(self.menu_data))
+        for mdata in self.menu_data:
+            key = CallKey.objects.filter(menu_id=self.vm_data["menu_id"], keys=mdata["key"]).first()
+            if key:
+                ck = CallKey.objects.get(pk=key.id)
+                ck.audio_text = mdata["text"]
+                ck.save()
 
     def on_error(self, error):
         log('Error received: {}'.format(error))
