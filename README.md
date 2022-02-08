@@ -1,6 +1,8 @@
 # phoneai_freeswitch
 freeswitch phone service
 
+![img](schema.png)
+
 Four Section
 
 1) lua scripts:
