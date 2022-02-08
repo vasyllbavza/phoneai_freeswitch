@@ -218,7 +218,7 @@ class ShowCallMenu(APIView):
         node_start = 0
         cm = CallMenu.objects.filter(call__number__number=dial_number).first()
 
-        tree = make_tree(cm.id, None, '')
+        tree = make_tree(cm.id, None, '', '')
 
         json_str = json.dumps(tree, indent=2)
         print(json_str)
