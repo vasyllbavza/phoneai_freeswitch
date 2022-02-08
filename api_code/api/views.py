@@ -277,7 +277,7 @@ class MakeCallSubMenuView(APIView):
         call_uuid = str(uuid.uuid4())
 
         menu.call.status = CallStatus.CALLING
-        menu.call.uuid = uuid
+        menu.call.uuid = call_uuid
         menu.call.save()
 
         cmd = 'bgapi'
