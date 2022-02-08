@@ -309,6 +309,32 @@ Four Section
 }
 ```
 
+    To send call with predefined menu, we can use this api
+
+    example:
+```
+    curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
+        https://phoneai.boomslang.io/api/makecall_submenu/?id=171
+
+    Response:
+        {
+            "dial_number": "13027410434",
+            "status": "success",
+            "call_uuid": "24960e50-3a98-403f-8e02-51f8f408acd4",
+            "message": "",
+            "fs_output": "+OK Job-UUID: 07cdc030-88cd-11ec-a1d5-a593d3cd889e\n"
+        }
+
+        {
+            "status": "fail",
+            "message": "menu is completed already.",
+            "fs_output": ""
+        }
+
+```
+
+
+
 https://phoneai.boomslang.io/api/callmenu/?number=18009256278
 3) dtmf input processing and store and initiate crawling
     api_code/call_esl.py
