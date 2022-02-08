@@ -3,7 +3,7 @@ class TreeNode(dict):
         super().__init__()
         self.__dict__ = self
         self.id = id
-        self.data = data
+        self.audio_text = data
         self.key = key
         self.children = list(children) if children is not None else []
 
