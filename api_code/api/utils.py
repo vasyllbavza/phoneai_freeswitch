@@ -1,7 +1,8 @@
 class TreeNode(dict):
-    def __init__(self, data, children=None, key = None):
+    def __init__(self, id, data, children=None, key = None):
         super().__init__()
         self.__dict__ = self
+        self.id = id
         self.data = data
         self.key = key
         self.children = list(children) if children is not None else []
