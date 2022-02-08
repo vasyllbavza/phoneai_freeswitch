@@ -278,7 +278,7 @@ class MakeCallSubMenuView(APIView):
 
         menu.call.status = CallStatus.CALLING
         menu.call.uuid = uuid
-        menu.call.call.save()
+        menu.call.save()
 
         cmd = 'bgapi'
         phonenumber_info = "is_new_call=0,phoneai_number_id=%s,phoneai_call_id=%s,call_menu_id=%s" % (str(number.id),str(call_id), str(call_menu_id))
