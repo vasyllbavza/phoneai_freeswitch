@@ -211,7 +211,7 @@ class ShowCallMenu(APIView):
         content['id'] = number.id
         content['number'] = number.number
         content['business_name'] = number.business_name
-        content['retry_auto'] = number.attempt
+        content['retry_enabled'] = number.retry_auto
         content['attempt'] = number.attempt
         content['completed'] = number.completed
 
