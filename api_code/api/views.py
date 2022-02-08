@@ -190,6 +190,7 @@ def make_tree(cm_id, child, key, parent_text, keys_to_reach):
     if cm:
         menu = {}
         menu["audio_text"] = cm.audio_text
+        menu["audio_text_debug"] = cm.audio_text_debug
         tree = TreeNode(cm.id, menu, child, key, parent_text, keys_to_reach)
         cks = CallKey.objects.filter(menu=cm.id)
         for ck in cks:

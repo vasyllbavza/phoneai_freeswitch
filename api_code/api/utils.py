@@ -10,6 +10,7 @@ class TreeNode(dict):
         }
         self.key = key
         self.audio_text = menu["audio_text"]
+        self.audio_text_debug = menu["audio_text_debug"]
         self.children = list(children) if children is not None else []
 
     def insert(self, obj):
