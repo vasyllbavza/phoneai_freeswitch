@@ -207,11 +207,11 @@ class ShowCallMenu(APIView):
         dial_number = request.query_params.get('number','')
 
         content = {}
-        content['status'] = 'success'
-
         content['number'] = dial_number
         number = PhoneNumber.objects.get(number=dial_number)
-        content['number'] = number.business_name
+        content['id'] = number.id
+        content['business_name'] = number.business_name
+        content['retry_auto'] = number.attempt
         content['attempt'] = number.attempt
         content['completed'] = number.completed
 
