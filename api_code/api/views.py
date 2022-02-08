@@ -188,7 +188,9 @@ def make_tree(cm_id, child, key, parent_text, keys_to_reach):
     tree = None
     cm = CallMenu.objects.get(pk=cm_id)
     if cm:
-        tree = TreeNode(cm.id, cm.audio_text,child, key, parent_text, keys_to_reach)
+        menu = {}
+        menu["audio_text"] = cm.audio_text
+        tree = TreeNode(cm.id, menu, child, key, parent_text, keys_to_reach)
         cks = CallKey.objects.filter(menu=cm.id)
         for ck in cks:
             if ck.next:

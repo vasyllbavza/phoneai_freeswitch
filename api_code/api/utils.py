@@ -1,5 +1,6 @@
 class TreeNode(dict):
-    def __init__(self, id, data, children=None, key = None, parent_text = None, keys_to_reach = None):
+
+    def __init__(self, id, menu, children=None, key = None, parent_text = None, keys_to_reach = None):
         super().__init__()
         self.__dict__ = self
         self.id = id
@@ -8,7 +9,7 @@ class TreeNode(dict):
             "keys_to_reach": keys_to_reach
         }
         self.key = key
-        self.audio_text = data
+        self.audio_text = menu["audio_text"]
         self.children = list(children) if children is not None else []
 
     def insert(self, obj):
