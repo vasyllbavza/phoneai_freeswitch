@@ -183,17 +183,17 @@ def menu_target_keys(menu_id):
         loop_count = loop_count + 1
     return dtmf[::-1]
 
-def make_tree(cm_id, child, key):
+def make_tree(cm_id, child, key, parent_text):
 
     tree = None
     cm = CallMenu.objects.get(pk=cm_id)
     if cm:
-        tree = TreeNode(cm.id, cm.audio_text,child, key)
+        tree = TreeNode(cm.id, cm.audio_text,child, key, parent_text)
         cks = CallKey.objects.filter(menu=cm.id)
         for ck in cks:
             if ck.next:
                 # child = make_tree(ck.next.id, None, ck.keys)
-                child = make_tree(ck.next.id, None, menu_target_keys(ck.next.id))
+                child = make_tree(ck.next.id, None, menu_target_keys(ck.next.id), ck.audio_text)
                 tree.children.append(child)
             # else:
             #     child = TreeNode("", None, ck.keys)
