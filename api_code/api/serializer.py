@@ -13,13 +13,13 @@ class CallLogSerializer(ModelSerializer):
             "id",
             "phone_number",
             "business_name",
-            "status",
+            "completed",
             "attempt",
             "created_at",
             "updated_at",
         ]
 
-    status = CharField(source='get_status_display')
+    completed = CharField(source='number.completed')
     phone_number = CharField(source='number.number')
     business_name = CharField(source='number.business_name')
     attempt = CharField(source='number.attempt')
