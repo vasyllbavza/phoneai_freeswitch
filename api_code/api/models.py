@@ -61,6 +61,7 @@ class CallMenu(models.Model):
                         ext_whitelist=(".mp3", ".wav", ".ogg"),
                         help_text=("Allowed type - .mp3, .wav, .ogg"))
     audio_text = models.TextField(null=True, blank=True)
+    audio_text_debug = models.TextField(null=True, blank=True)
 
     completed = models.BooleanField(default=False)
 
