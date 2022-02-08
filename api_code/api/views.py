@@ -207,9 +207,9 @@ class ShowCallMenu(APIView):
         dial_number = request.query_params.get('number','')
 
         content = {}
-        content['number'] = dial_number
         number = PhoneNumber.objects.get(number=dial_number)
         content['id'] = number.id
+        content['number'] = number.number
         content['business_name'] = number.business_name
         content['retry_auto'] = number.attempt
         content['attempt'] = number.attempt
