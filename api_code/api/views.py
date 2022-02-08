@@ -183,17 +183,17 @@ def menu_target_keys(menu_id):
         loop_count = loop_count + 1
     return dtmf[::-1]
 
-def make_tree(cm_id, child, key, parent_text):
+def make_tree(cm_id, child, key, parent_text, keys_to_reach):
 
     tree = None
     cm = CallMenu.objects.get(pk=cm_id)
     if cm:
-        tree = TreeNode(cm.id, cm.audio_text,child, key, parent_text)
+        tree = TreeNode(cm.id, cm.audio_text,child, key, parent_text, keys_to_reach)
         cks = CallKey.objects.filter(menu=cm.id)
         for ck in cks:
             if ck.next:
                 # child = make_tree(ck.next.id, None, ck.keys)
-                child = make_tree(ck.next.id, None, menu_target_keys(ck.next.id), ck.audio_text)
+                child = make_tree(ck.next.id, None, ck.keys, ck.audio_text, menu_target_keys(ck.next.id))
                 tree.children.append(child)
             # else:
             #     child = TreeNode("", None, ck.keys)
@@ -218,7 +218,7 @@ class ShowCallMenu(APIView):
         node_start = 0
         cm = CallMenu.objects.filter(call__number__number=dial_number).first()
 
-        tree = make_tree(cm.id, None, '', '')
+        tree = make_tree(cm.id, None, '', '', '')
 
         json_str = json.dumps(tree, indent=2)
         print(json_str)
