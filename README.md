@@ -349,3 +349,10 @@ https://phoneai.boomslang.io/api/callmenu/?number=18009256278
     pass: nguAO0YesMt162fnVbMwTa0tgeg
 ```
 
+
+
+# cronjob
+/etc/crontab
+```
+* * * * * root  /root/py36ENV/bin/python /root/code/phoneai_freeswitch/api_code/call_retry.py > /var/log/call_cron.log 2>&1
+```
