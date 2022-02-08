@@ -3,6 +3,10 @@ class TreeNode(dict):
         super().__init__()
         self.__dict__ = self
         self.id = id
+        self.info = {
+            "parent_text": parent_text,
+            "keys_to_reach": keys_to_reach
+        }
         self.parent_text = parent_text
         self.keys_to_reach = keys_to_reach
         self.key = key
