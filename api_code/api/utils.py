@@ -7,8 +7,6 @@ class TreeNode(dict):
             "parent_text": parent_text,
             "keys_to_reach": keys_to_reach
         }
-        self.parent_text = parent_text
-        self.keys_to_reach = keys_to_reach
         self.key = key
         self.audio_text = data
         self.children = list(children) if children is not None else []
