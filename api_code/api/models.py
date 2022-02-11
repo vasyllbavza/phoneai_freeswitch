@@ -128,6 +128,9 @@ class AgentCallLog(models.Model):
     def __str__(self):
         return f"{self.number} [{self.menu_id}]"
 
+    def phonenumber(self):
+        return f"{self.number.number}"
+
     class Meta:
         db_table = 'agentcall_logs'
         managed = True

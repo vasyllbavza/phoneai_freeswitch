@@ -172,9 +172,9 @@ class CallMenuAdmin(admin.ModelAdmin):
 admin.site.register(CallMenu, CallMenuAdmin)
 
 class AgentCallLogAdmin(admin.ModelAdmin):
-    list_display = ('id', 'status', 'number', 'menu', 'uuid', 'forwarding_number', 'audio_file', 'created_at', 'updated_at', 'hangup_link')
+    list_display = ('id', 'phonenumber', 'status', 'menu_id', 'uuid', 'forwarding_number', 'audio_file', 'created_at', 'hangup_link')
     list_filter = [
-        "number",
+        "number__number",
         "created_at",
     ]
 

@@ -316,6 +316,18 @@ try:
                                 pass
                             fs_set_var(con, call_uuid,"current_menu_id", current_menu_id)
 
+                        if event_action == "go_call_ended":
+                            agentcall_id = get_header(e, "agentcall_id")
+                            record_uuid = get_header(e, "record_uuid")
+                            record_uuid = "%s.wav" % record_uuid
+                            try:
+                                agentcall = AgentCallLog.objects.get(pk=agentcall_id)
+                                agentcall.status = CallStatus.PROCESSED
+                                agentcall.audio_file = record_uuid
+                                agentcall.save()
+                            except:
+                                pass
+
                         if event_action == "call_ended":
                             print(e.serialize())
                             record_uuid = get_header(e, "record_uuid")
