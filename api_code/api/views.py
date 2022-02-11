@@ -337,10 +337,9 @@ class MakeCallSubMenuView(APIView):
         callParams = "{%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (phonenumber_info,caller_id,call_uuid)
         args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai_go.lua)" %(callParams,dial_number)
         print( "%s %s" %(cmd,args) )
-        content["command"] = cmd
-        content["args"] = args
-        return Response(content)
-
+        # content["command"] = cmd
+        # content["args"] = args
+        # return Response(content)
         result = freeswitch_execute(cmd,args)
         if result['status'] < 1:
             content['status'] = "fail"
