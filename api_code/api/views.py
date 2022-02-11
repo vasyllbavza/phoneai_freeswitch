@@ -306,6 +306,13 @@ class MakeCallSubMenuView(APIView):
 
         content = {}
 
+        forwarding_number = request.query_params.get('forwarding_number','')
+        if forwarding_number == "":
+            content['status'] = "fail"
+            content['message'] = "forwarding_number is required!"
+            content['fs_output'] = ""
+            return Response(content)
+
         menu_id = request.query_params.get('id','')
         try:
             menu = CallMenu.objects.get(pk=menu_id)
