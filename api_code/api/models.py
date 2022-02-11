@@ -131,6 +131,16 @@ class AgentCallLog(models.Model):
     def phonenumber(self):
         return f"{self.number.number}"
 
+    def audio_file_player(self):
+        """audio player tag for admin"""
+        if self.audio_file:
+            file_url = settings.MEDIA_URL + str(self.audio_file)
+            player_string = '<a src="%s" controls>Recording</audio>' % (file_url)
+            return player_string
+
+    audio_file_player.allow_tags = True
+    audio_file_player.short_description = ('Audio file')
+
     class Meta:
         db_table = 'agentcall_logs'
         managed = True
