@@ -15,6 +15,7 @@ application = get_wsgi_application()
 from django.conf import settings
 
 from api.models import (
+    AgentCallLog,
     CallLog,
     CallKey,
     CallStatus,
@@ -268,9 +269,12 @@ try:
                                 logger.exception("CallLog save error!!")
 
                         if event_action == "go_call_started":
+                            agentcall_id = get_header(e, "agentcall_id")
                             try:
-                                number = PhoneNumber.objects.get(pk=number_id)
-                                call = CallLog.objects.get(pk=call_id)
+                                agentcall = AgentCallLog.objects.get(pk=agentcall_id)
+                                agentcall.status = CallStatus.ANSWERED
+                                agentcall.save()
+
                                 if call_menu_id:
                                     dtmf = ""
                                     cm = CallMenu.objects.get(pk=call_menu_id)
