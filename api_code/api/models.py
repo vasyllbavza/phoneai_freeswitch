@@ -136,7 +136,7 @@ class AgentCallLog(models.Model):
         """audio player tag for admin"""
         if self.audio_file:
             file_url = settings.MEDIA_URL + str(self.audio_file)
-            player_string = '<a href="%s" targer="_blank">Recording</a>' % (file_url)
+            player_string = '<a href="%s" target="_blank">Recording</a>' % (file_url)
             return format_html(player_string)
 
     audio_file_player.allow_tags = True
