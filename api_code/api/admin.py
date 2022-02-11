@@ -1,3 +1,4 @@
+from cProfile import label
 from django.contrib import admin
 from django.conf.urls import url
 from django.utils.html import format_html
@@ -172,7 +173,7 @@ class CallMenuAdmin(admin.ModelAdmin):
 admin.site.register(CallMenu, CallMenuAdmin)
 
 class AgentCallLogAdmin(admin.ModelAdmin):
-    list_display = ('id', 'phonenumber', 'status', 'menu_id', 'uuid', 'forwarding_number', 'audio_file', 'created_at', 'hangup_link')
+    list_display = ('id', 'phonenumber', 'hangup_link', 'menu_id', 'uuid', 'forwarding_number', 'audio_file', 'created_at')
     list_filter = [
         "number__number",
         "created_at",
@@ -181,12 +182,13 @@ class AgentCallLogAdmin(admin.ModelAdmin):
     def hangup_link(self, obj):
         if obj.status == CallStatus.CALLING or obj.status == CallStatus.ANSWERED:
             return format_html(
-                '<a class="button" href="{}">Hangup</a>&nbsp;',
+                '{}&nbsp;&nbsp;<a class="button" href="{}">Hangup</a>&nbsp;',
+                CallStatus.choices[obj.status][1],
                 reverse('admin:hangup-call', args=[obj.pk]),
             )
-        return ""
+        return CallStatus.choices[obj.status][1]
 
-    hangup_link.short_description = 'Hangup Call'
+    hangup_link.short_description = 'Call Status'
     hangup_link.allow_tags = True
 
     def get_urls(self):
