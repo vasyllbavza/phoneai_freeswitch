@@ -2,6 +2,7 @@ from django.db import models
 from audiofield.fields import AudioField
 from django.conf import settings
 import os.path
+from django.utils.html import format_html
 
 # Create your models here.
 class CallStatus(models.IntegerChoices):
@@ -136,7 +137,7 @@ class AgentCallLog(models.Model):
         if self.audio_file:
             file_url = settings.MEDIA_URL + str(self.audio_file)
             player_string = '<a href="%s">Recording</a>' % (file_url)
-            return player_string
+            return format_html(player_string)
 
     audio_file_player.allow_tags = True
     audio_file_player.short_description = ('Audio file')
