@@ -267,6 +267,35 @@ try:
                             except:
                                 logger.exception("CallLog save error!!")
 
+                        if event_action == "go_call_started":
+                            try:
+                                number = PhoneNumber.objects.get(pk=number_id)
+                                call = CallLog.objects.get(pk=call_id)
+                                if call_menu_id:
+                                    dtmf = ""
+                                    cm = CallMenu.objects.get(pk=call_menu_id)
+                                    firstmenu = CallMenu.objects.filter(call__number__id=cm.call.number.id).first()
+                                    fs_set_var(con, call_uuid,"current_menu_id", firstmenu.id)
+                                    loop_count = 1
+                                    while firstmenu.id != call_menu_id and loop_count < 10:
+                                        ck = CallKey.objects.filter(next__id=call_menu_id).first()
+                                        if ck:
+                                            if dtmf == "":
+                                                dtmf += '%s' % ck.keys
+                                            else:
+                                                dtmf += '%s' % ck.keys
+                                            call_menu_id = ck.menu.id
+                                        loop_count = loop_count + 1
+
+                                    fs_set_var(con, call_uuid,"key_travel", dtmf)
+                                    dtmf = ""
+                                    ck_next = CallKey.objects.filter(next__isnull=True,menu=cm).first()
+                                    if ck_next:
+                                        dtmf = ck_next.keys
+                                    fs_set_var(con, call_uuid,"key_target", dtmf)
+                            except:
+                                logger.exception("CallLog save error!!")
+
                         if event_action == "key_pressed":
                             call_menu_id = get_header(e, "call_menu_id")
                             current_menu_id = get_header(e, "current_menu_id")

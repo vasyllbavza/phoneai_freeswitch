@@ -248,7 +248,7 @@ class PhonenumberView(APIView):
         serializer = PhonenumberSerializer(number)
         return Response(serializer.data)
 
-class MakeCallSubMenuView(APIView):
+class MakeRetryCallSubMenuView(APIView):
 
     def get(self,request,format=None):
 
@@ -284,6 +284,58 @@ class MakeCallSubMenuView(APIView):
         phonenumber_info = "is_new_call=0,phoneai_number_id=%s,phoneai_call_id=%s,call_menu_id=%s" % (str(number.id),str(call_id), str(call_menu_id))
         callParams = "{%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (phonenumber_info,caller_id,call_uuid)
         args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai.lua)" %(callParams,dial_number)
+        print( "%s %s" %(cmd,args) )
+        result = freeswitch_execute(cmd,args)
+        if result['status'] < 1:
+            content['status'] = "fail"
+            content['message'] = result['message']
+            content['fs_output'] = ""
+            return Response(content)
+
+        content['dial_number'] = dial_number
+        content['status'] = "success"
+        content['call_uuid'] = call_uuid
+        content['message'] = result['message']
+        content['fs_output'] = result['fs_output']
+
+        return Response(content)
+
+class MakeCallSubMenuView(APIView):
+
+    def get(self,request,format=None):
+
+        content = {}
+
+        menu_id = request.query_params.get('id','')
+        try:
+            menu = CallMenu.objects.get(pk=menu_id)
+        except:
+            content['status'] = "fail"
+            content['message'] = "menu not found"
+            content['fs_output'] = ""
+            return Response(content)
+
+        if menu.completed == True:
+            content['status'] = "fail"
+            content['message'] = "menu is completed already."
+            content['fs_output'] = ""
+            return Response(content)
+
+        caller_id = '14582037530'
+        number = menu.call.number
+        dial_number = number.number
+        call_id = menu.call.id
+        call_menu_id = menu.id
+        call_uuid = str(uuid.uuid4())
+
+        menu.call.status = CallStatus.CALLING
+        menu.call.uuid = call_uuid
+        menu.call.save()
+
+        cmd = 'bgapi'
+        phonenumber_info = "is_new_call=0,phoneai_number_id=%s,phoneai_call_id=%s,call_menu_id=%s" % (str(number.id),str(call_id), str(call_menu_id))
+        callParams = "{%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (phonenumber_info,caller_id,call_uuid)
+        args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai_go.lua)" %(callParams,dial_number)
         print( "%s %s" %(cmd,args) )
         result = freeswitch_execute(cmd,args)
         if result['status'] < 1:
