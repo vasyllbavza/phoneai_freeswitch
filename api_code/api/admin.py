@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404,redirect
 
 # Register your models here.
 from api.models import (
+    AgentCallLog,
     CallLog,
     CallKey,
     CallStatus,
@@ -169,3 +170,45 @@ class CallMenuAdmin(admin.ModelAdmin):
     # ]
 
 admin.site.register(CallMenu, CallMenuAdmin)
+
+class AgentCallLogAdmin(admin.ModelAdmin):
+    list_display = ('id', 'status', 'number', 'menu', 'uuid', 'forwarding_number', 'audio_file', 'created_at', 'updated_at', 'hangup_link')
+    list_filter = [
+        "number",
+        "created_at",
+    ]
+
+    def hangup_link(self, obj):
+        if obj.status == CallStatus.CALLING or obj.status == CallStatus.ANSWERED:
+            return format_html(
+                '<a class="button" href="{}">Hangup</a>&nbsp;',
+                reverse('admin:hangup-call', args=[obj.pk]),
+            )
+        return ""
+
+    hangup_link.short_description = 'Hangup Call'
+    hangup_link.allow_tags = True
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            url(
+                r'^hangup_call_action/(?P<pk>\d+)/$',
+                self.admin_site.admin_view(self.hangup_view),
+                name='hangup-call',
+            ),
+        ]
+        return custom_urls + urls
+
+    # @permission_required('CallLog.can_change')
+    def hangup_view(self, request, pk):
+        obj = get_object_or_404(AgentCallLog, pk=pk)
+        cmd = 'bgapi'
+        args = f"uuid_kill {obj.uuid}"
+        result = freeswitch_execute(cmd,args)
+        print(result)
+        print(args)
+        return redirect('/api/admin/api/agentcalllog/')
+
+
+admin.site.register(AgentCallLog, AgentCallLogAdmin)

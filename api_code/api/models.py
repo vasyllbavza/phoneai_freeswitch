@@ -111,3 +111,25 @@ class CallKey(models.Model):
         managed = True
         verbose_name = 'CallKey'
         verbose_name_plural = 'CallKeys'
+
+class AgentCallLog(models.Model):
+
+    number = models.ForeignKey(PhoneNumber, on_delete=models.CASCADE)
+    menu = models.ForeignKey(CallMenu, on_delete=models.DO_NOTHING)
+    uuid = models.CharField(max_length=250, blank=True, null=True)
+    status = models.IntegerField(default=CallStatus.PENDING, choices=CallStatus.choices)
+    forwarding_number = models.CharField(max_length=250, blank=False, null=False)
+
+    audio_file = models.TextField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return f"{self.number} [{self.menu_id}]"
+
+    class Meta:
+        db_table = 'agentcall_logs'
+        managed = True
+        verbose_name = 'Agent Call Log'
+        verbose_name_plural = 'Agent Call Logs'
