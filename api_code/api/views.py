@@ -14,6 +14,7 @@ from rest_framework.pagination import LimitOffsetPagination
 import json
 
 from api.models import (
+    AgentCallLog,
     CallLog,
     CallStatus,
     PhoneNumber,
@@ -339,8 +340,13 @@ class MakeCallSubMenuView(APIView):
         menu.call.uuid = call_uuid
         menu.call.save()
 
+        agentcall = AgentCallLog(number=number, menu=menu,uuid=call_uuid)
+        agentcall.status = CallStatus.CALLING
+        agentcall.forwarding_number = forwarding_number
+        agentcall.save()
+
         cmd = 'bgapi'
-        phonenumber_info = "forwarding_number=%s,is_new_call=0,phoneai_number_id=%s,phoneai_call_id=%s,call_menu_id=%s" % (forwarding_number,str(number.id),str(call_id), str(call_menu_id))
+        phonenumber_info = "agentcall_id=%s,forwarding_number=%s,is_new_call=0,phoneai_number_id=%s,phoneai_call_id=%s,call_menu_id=%s" % (str(agentcall.id),forwarding_number,str(number.id),str(call_id), str(call_menu_id))
         callParams = "{%s,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=%s,origination_uuid=%s}" % (phonenumber_info,caller_id,call_uuid)
         args = "originate %ssofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*%s &lua(phoneai_go.lua)" %(callParams,dial_number)
         print( "%s %s" %(cmd,args) )
