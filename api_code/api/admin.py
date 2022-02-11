@@ -16,6 +16,10 @@ from api.models import (
 )
 from api.views import freeswitch_execute
 
+admin.site.site_header = 'PhoneAI adminstration'
+admin.site.site_title =  'PhoneAI adminstration'
+admin.site.name = "PhoneAI"
+
 class PhoneNumberAdmin(admin.ModelAdmin):
     list_display = ('id', 'number', 'business_name' ,'attempt', 'completed', 'retry_auto', 'max_attempt', 'created_at', 'updated_at')
     list_filter = [
@@ -23,6 +27,7 @@ class PhoneNumberAdmin(admin.ModelAdmin):
         "created_at",
         "retry_auto",
     ]
+
     search_fields = ['number', 'business_name']
 
 admin.site.register(PhoneNumber, PhoneNumberAdmin)
