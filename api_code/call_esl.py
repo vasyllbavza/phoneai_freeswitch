@@ -92,7 +92,7 @@ def fs_set_var(conn, uuid, var, val):
         res = fs_result.split('\n\n',1)
         if res[1]:
             fs_result = res[1]
-            logger.info(fs_result)
+            # logger.info(fs_result)
             return True
     return False
 
