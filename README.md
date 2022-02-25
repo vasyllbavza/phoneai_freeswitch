@@ -316,7 +316,7 @@ Four Section
     example:
 ```
     curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
-        https://phoneai.boomslang.io/api/makecall_submenu/?id=171
+        https://phoneai.boomslang.io/api/makecall_submenu/?id=171&forwarding_number=XXXXXXXXX
 
     Response:
         {
@@ -336,8 +336,9 @@ Four Section
 ```
 
 
+####
 
-https://phoneai.boomslang.io/api/callmenu/?number=18009256278
+
 3) dtmf input processing and store and initiate crawling
     api_code/call_esl.py
 
