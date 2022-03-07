@@ -18,8 +18,12 @@ from api.models import (
     CallLog,
     CallStatus,
     PhoneNumber,
+    SMSLog,
 )
-from api.utils import TreeNode
+from api.utils import (
+    TreeNode,
+    send_sms,
+)
 from api.serializer import (
     CallLogSerializer,
     PhonenumberSerializer
@@ -365,5 +369,25 @@ class MakeCallSubMenuView(APIView):
         content['call_uuid'] = call_uuid
         content['message'] = result['message']
         content['fs_output'] = result['fs_output']
+
+        return Response(content)
+
+class SendSMSView(APIView):
+
+    def post(self,request,format=None):
+
+        to_number = request.query_params.get('to_number','')
+        sms_text = request.query_params.get('sms_text','')
+
+        sms = SMSLog(sms_to=to_number, sms_body=sms_text, status=0)
+        sms.save()
+
+        result = send_sms(to_number=to_number,sms_text=sms_text)
+        sms.sms_result = result
+        sms.save()
+
+        content = {}
+        content["status"] = "ok"
+        content["result"] = str(result)
 
         return Response(content)

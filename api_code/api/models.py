@@ -147,3 +147,22 @@ class AgentCallLog(models.Model):
         managed = True
         verbose_name = 'Agent Call Log'
         verbose_name_plural = 'Agent Call Logs'
+
+class SMSLog(models.Model):
+
+    sms_to = models.CharField(max_length=20)
+    sms_body = models.CharField(max_length=140)
+    status = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+    sms_result = models.TextField(max_length=500, blank=True, null=True)
+    sms_id = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.sms_to} [{self.sms_body}]"
+
+    class Meta:
+        db_table = 'sms_logs'
+        managed = True
+        verbose_name = 'SMS Log'
+        verbose_name_plural = 'SMS Logs'

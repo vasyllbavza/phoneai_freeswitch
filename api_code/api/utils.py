@@ -1,3 +1,6 @@
+import json
+from flowroutenumbersandmessaging.flowroutenumbersandmessaging_client import FlowroutenumbersandmessagingClient
+
 class TreeNode(dict):
 
     def __init__(self, id, menu, children=None, key = None, parent_text = None, keys_to_reach = None):
@@ -24,3 +27,28 @@ class TreeNode(dict):
 #        node.children = [TreeNode.from_dict(child) for child in node.children]
         node.children = list(map(TreeNode.from_dict, node.children))
         return node
+
+def send_sms(to_number, sms_text):
+
+    basic_auth_user_name = "06b93c4e"
+    basic_auth_password = "947410ae2da44b59867c564cbbc7c0c3"
+    mobile_number = "17866648610"
+    from_number = "14582037530"
+
+    client = FlowroutenumbersandmessagingClient(basic_auth_user_name, basic_auth_password)
+    messages_controller = client.messages
+    req = {
+        "data": {
+            "type": "message",
+            "attributes": {
+                "to": to_number,
+                "from": from_number,
+                "body": ""
+            }
+        }
+    }
+    req["data"]["attributes"]["body"] = str(sms_text)
+    request_body = json.dumps(req)
+    print(request_body)
+    result = messages_controller.send_a_message(request_body)
+    return result
