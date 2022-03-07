@@ -376,8 +376,8 @@ class SendSMSView(APIView):
 
     def post(self,request,format=None):
 
-        to_number = request.query_params.get('to_number','')
-        sms_text = request.query_params.get('sms_text','')
+        to_number = request.query_params.post('to_number','')
+        sms_text = request.query_params.post('sms_text','')
 
         sms = SMSLog(sms_to=to_number, sms_body=sms_text, status=0)
         sms.save()
