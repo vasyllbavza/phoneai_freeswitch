@@ -47,6 +47,5 @@ class SMSSerializer(Serializer):
     sms_body = CharField(required=True,max_length=140)
     status = IntegerField(default=0)
 
-    # def create(self, validated_data):
-
-    #     return SMSLog.objects.create(**validated_data)
+    def create(self, validated_data):
+        return SMSLog.objects.create(**validated_data)

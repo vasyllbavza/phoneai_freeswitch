@@ -148,11 +148,17 @@ class AgentCallLog(models.Model):
         verbose_name = 'Agent Call Log'
         verbose_name_plural = 'Agent Call Logs'
 
+class SMSStatus(models.IntegerChoices):
+    PENDING = 0, 'Pending'
+    QUEUE = 1, 'Queue'
+    SUCCESS = 2, 'Success'
+    FAILED = 3, 'Failed'
+
 class SMSLog(models.Model):
 
     sms_to = models.CharField(max_length=20)
     sms_body = models.CharField(max_length=140)
-    status = models.IntegerField(default=0)
+    status = models.IntegerField(default=SMSStatus.PENDING, choices=SMSStatus.choices)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
     sms_result = models.TextField(max_length=500, blank=True, null=True)
