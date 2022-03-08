@@ -425,6 +425,9 @@ class SMSCallbackView(APIView):
 #        "type": "delivery_receipt"
 #    }
 # }
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
     def post(self,request,format=None):
 
         try:
