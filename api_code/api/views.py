@@ -432,6 +432,7 @@ class SMSCallbackView(APIView):
             smsId = postdata['data']['id']
             sms = SMSLog.objects.get(sms_id=smsId)
             sms.dlr_code = postdata['data']['attributes']['status_code']
+            sms.status = SMSStatus.SUCCESS
             sms.save()
             content = {}
             content["status"] = "ok"
