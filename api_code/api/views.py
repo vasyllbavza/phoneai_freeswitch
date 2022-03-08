@@ -393,8 +393,7 @@ class SendSMSView(APIView):
             sms.sms_result = result
             sms.status = SMSStatus.QUEUE
             try:
-                rdata = json.loads(str(result))
-                sms.sms_id = rdata['data']['id']
+                sms.sms_id = result['data']['id']
             except Exception:
                 # logger.exception("sms api response error")
                 pass
