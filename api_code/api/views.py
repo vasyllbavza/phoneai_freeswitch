@@ -80,6 +80,9 @@ def freeswitch_execute(cmd,params):
 
 class MakeCallView(APIView):
 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+
     def get(self,request,format=None):
 
         content = {}
@@ -157,6 +160,9 @@ class MakeCallView(APIView):
 
 class ScanCallView(APIView, LimitOffsetPagination):
 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+
     def get(self,request,format=None):
 
         content = {}
@@ -217,6 +223,9 @@ def make_tree(cm_id, child, key, parent_text, keys_to_reach):
 
 class ShowCallMenu(APIView):
 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+
     def get(self, request, format=None):
 
         dial_number = request.query_params.get('number','')
@@ -242,6 +251,9 @@ class ShowCallMenu(APIView):
 
 class PhonenumberView(APIView):
 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+
     def post(self,request,format=None):
 
         content = {}
@@ -258,6 +270,9 @@ class PhonenumberView(APIView):
         return Response(serializer.data)
 
 class MakeRetryCallSubMenuView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
 
     def get(self,request,format=None):
 
@@ -310,6 +325,9 @@ class MakeRetryCallSubMenuView(APIView):
         return Response(content)
 
 class MakeCallSubMenuView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
 
     def get(self,request,format=None):
 
@@ -378,6 +396,9 @@ class MakeCallSubMenuView(APIView):
 
 class SendSMSView(APIView):
 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+
     def post(self,request,format=None):
 
         # to_number = request.query_params.post('to_number','')
@@ -425,8 +446,6 @@ class SMSCallbackView(APIView):
 #        "type": "delivery_receipt"
 #    }
 # }
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
 
     def post(self,request,format=None):
 
