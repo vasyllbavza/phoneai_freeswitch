@@ -384,10 +384,10 @@ class SendSMSView(APIView):
 
         smsdata = SMSSerializer(data=request.data)
         if smsdata.is_valid():
-            sms = SMSLog(sms_to=smsdata.sms_to, sms_body=smsdata.sms_body, status=0)
+            sms = SMSLog(sms_to=smsdata.data['sms_to'], sms_body=smsdata.data['sms_body'], status=0)
             sms.save()
 
-            result = send_sms(to_number=smsdata.sms_to,sms_text=smsdata.sms_body)
+            result = send_sms(to_number=smsdata.data['sms_to'],sms_text=smsdata.data['sms_body'])
             sms.sms_result = result
             sms.save()
 
