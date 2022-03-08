@@ -222,9 +222,8 @@ class AgentCallLogAdmin(admin.ModelAdmin):
 admin.site.register(AgentCallLog, AgentCallLogAdmin)
 
 class SMSLogAdmin(admin.ModelAdmin):
-    list_display = ('id', 'sms_to', 'keys', 'audio_text', 'next', 'created_at', 'updated_at')
+    list_display = ('id', 'sms_to', 'status', 'sms_body', 'sms_result', 'sms_id', 'updated_at')
     list_filter = [
-        "menu",
         "created_at",
     ]
 
