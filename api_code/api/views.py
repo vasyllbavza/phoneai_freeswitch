@@ -446,14 +446,24 @@ class SMSCallbackView(APIView):
 #        "type": "delivery_receipt"
 #    }
 # }
-
+# {
+#     attributes: {
+#         to: 17866648610,
+#         from: 14582037530,
+#         body: hello there test test 123467,
+#         status: message buffered,
+#         status_code: 1003
+#     },
+#     id: mdr2-04de8f38c6ee42c7bfd784850277d576,
+#     type: delivery_receipt
+# }
     def post(self,request,format=None):
 
         try:
             postdata = request.data
-            smsId = postdata['data']['id']
+            smsId = postdata['id']
             sms = SMSLog.objects.get(sms_id=smsId)
-            sms.dlr_code = postdata['data']['attributes']['status_code']
+            sms.dlr_code = postdata['attributes']['status_code']
             sms.status = SMSStatus.SUCCESS
             sms.save()
             content = {}
