@@ -410,22 +410,26 @@ class SendSMSView(APIView):
             # sms.save()
             sms = smsdata.save()
 
-            result = send_sms(to_number=smsdata.data['sms_to'],sms_text=smsdata.data['sms_body'])
-            sms.sms_result = result
-            sms.status = SMSStatus.QUEUE
             try:
-                sms.sms_id = result['data']['id']
-            except Exception:
-                # logger.exception("sms api response error")
-                pass
-            sms.save()
+                result = send_sms(to_number=smsdata.data['sms_to'],sms_text=smsdata.data['sms_body'])
+                sms.sms_result = result
+                sms.status = SMSStatus.QUEUE
+                try:
+                    sms.sms_id = result['data']['id']
+                except Exception:
+                    # logger.exception("sms api response error")
+                    pass
+                sms.save()
 
-            content = {}
-            content["status"] = "ok"
-            content["result"] = str(result)
-
-            return Response(smsdata.data, status=status.HTTP_201_CREATED)
-
+                content = {}
+                content["status"] = "ok"
+                content["result"] = str(result)
+                return Response(smsdata.data, status=status.HTTP_201_CREATED)
+            except:
+                content = {}
+                content["status"] = "failed"
+                return Response(smsdata.errors, status=status.HTTP_400_BAD_REQUEST)
+        
         return Response(smsdata.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SMSCallbackView(APIView):
