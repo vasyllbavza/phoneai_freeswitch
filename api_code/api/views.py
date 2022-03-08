@@ -406,3 +406,35 @@ class SendSMSView(APIView):
             return Response(smsdata.data, status=status.HTTP_201_CREATED)
 
         return Response(smsdata.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SMSCallbackView(APIView):
+# {
+#    "data": {
+#        "attributes": {
+#            "body": "test sms on v2",
+#            "level": 2,
+#            "status": "message buffered",
+#            "status_code": 1003,
+#            "status_code_description": "Message accepted by Carrier",
+#            "timestamp": "2017-12-21T16:44:35+00:00"
+#        },
+#        "id": "mdr2-39cadeace66e11e7aff806cd7f24ba2d",
+#        "links": {
+#            "related": "https://api.flowroute.com/v2.2/messages/mdr2-39cadeace66e11e7aff806cd7f24ba2d"
+#        },
+#        "type": "delivery_receipt"
+#    }
+# }
+    def post(self,request,format=None):
+
+        try:
+            postdata = request.data
+            smsId = postdata['data']['id']
+            sms = SMSLog.objects.get(sms_id=smsId)
+            sms.dlr_code = postdata['data']['attributes']['status_code']
+            sms.save()
+            content = {}
+            content["status"] = "ok"
+            return Response(content, status=status.HTTP_200_OK)
+        except:
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
