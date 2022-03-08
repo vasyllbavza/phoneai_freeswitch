@@ -428,7 +428,7 @@ class SendSMSView(APIView):
             except:
                 content = {}
                 content["status"] = "failed"
-                return Response(smsdata.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
         
         return Response(smsdata.errors, status=status.HTTP_400_BAD_REQUEST)
 
