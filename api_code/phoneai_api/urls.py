@@ -70,7 +70,7 @@ urlpatterns = [
     path('api/scan/',ScanCallView.as_view()),
     path('api/callmenu/',ShowCallMenu.as_view()),
     path('api/sendsms/',SendSMSView.as_view()),
-    path('sms/callback',SMSCallbackView.as_view()),
+    path('api/sms/callback/',SMSCallbackView.as_view()),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
