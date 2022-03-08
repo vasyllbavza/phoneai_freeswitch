@@ -163,7 +163,7 @@ class SMSLog(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True)
     sms_result = models.TextField(max_length=500, blank=True, null=True)
     sms_id = models.CharField(max_length=100, blank=True, null=True)
-    dlr_code = models.IntegerField(default=0, verbose_name="https://support.flowroute.com/681766-Delivery-Receipt-Response-Codes")
+    dlr_code = models.IntegerField(default=0, help_text="https://support.flowroute.com/681766-Delivery-Receipt-Response-Codes")
     def __str__(self):
         return f"{self.sms_to} [{self.sms_body}]"
 
