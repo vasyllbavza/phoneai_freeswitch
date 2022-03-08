@@ -11,6 +11,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import status
+
 import json
 
 from api.models import (
@@ -26,7 +28,8 @@ from api.utils import (
 )
 from api.serializer import (
     CallLogSerializer,
-    PhonenumberSerializer
+    PhonenumberSerializer,
+    SMSSerializer,
 )
 
 from phoneai_api import settings
@@ -376,18 +379,23 @@ class SendSMSView(APIView):
 
     def post(self,request,format=None):
 
-        to_number = request.query_params.post('to_number','')
-        sms_text = request.query_params.post('sms_text','')
+        # to_number = request.query_params.post('to_number','')
+        # sms_text = request.query_params.post('sms_text','')
 
-        sms = SMSLog(sms_to=to_number, sms_body=sms_text, status=0)
-        sms.save()
+        smsdata = SMSSerializer(data=request.data)
+        if smsdata.is_valid():
+            sms = SMSLog(sms_to=smsdata.sms_to, sms_body=smsdata.sms_body, status=0)
+            sms.save()
 
-        result = send_sms(to_number=to_number,sms_text=sms_text)
-        sms.sms_result = result
-        sms.save()
+            result = send_sms(to_number=smsdata.sms_to,sms_text=smsdata.sms_body)
+            sms.sms_result = result
+            sms.save()
 
-        content = {}
-        content["status"] = "ok"
-        content["result"] = str(result)
+            content = {}
+            content["status"] = "ok"
+            content["result"] = str(result)
 
-        return Response(content)
+            # smsdata.save()
+            return Response(smsdata.data, status=status.HTTP_201_CREATED)
+
+        return Response(smsdata.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,10 +1,13 @@
+from email.policy import default
 from django.db.models import fields
 from rest_framework.serializers import (
     CharField,
     ModelSerializer,
+    Serializer,
+    IntegerField,
 )
 
-from api.models import CallLog, CallStatus, PhoneNumber
+from api.models import CallLog, CallStatus, PhoneNumber, SMSLog
 
 class CallLogSerializer(ModelSerializer):
     class Meta:
@@ -36,3 +39,14 @@ class PhonenumberSerializer(ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+class SMSSerializer(Serializer):
+
+    id = IntegerField(read_only=True)
+    sms_to = CharField(required=True,max_length=20)
+    sms_body = CharField(required=True,max_length=140)
+    status = IntegerField(default=0)
+
+    # def create(self, validated_data):
+
+    #     return SMSLog.objects.create(**validated_data)
