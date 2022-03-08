@@ -25,14 +25,14 @@ Four Section
 
     example:
 ```
-    curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
+    curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" \
         https://phoneai.boomslang.io/api/makecall/?number=1XXXXXXXXXX
 ```
 
     To make the call menu complete of old in-complement menu we can use an extra param for this
     example:
 ```
-    curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
+    curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" \
         https://phoneai.boomslang.io/api/makecall/?number=1XXXXXXXXXX&new=0
 ```
 
@@ -40,7 +40,7 @@ Four Section
 
     example:
 ```
-    curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
+    curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" \
         https://phoneai.boomslang.io/api/scan/?limit=3&offset=0&number=18009256278
 
     Response:
@@ -80,7 +80,7 @@ Four Section
     To get Call menu tree, we can use this api
     example:
 ```
-    curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
+    curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" \
         https://phoneai.boomslang.io/api/callmenu/?number=14582037530
 
     Response:
@@ -315,7 +315,7 @@ Four Section
 
     example:
 ```
-    curl -H "Authorization: Token afd8b1c1d09600bc31ac222174ed308256a34ce1" \
+    curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" \
         https://phoneai.boomslang.io/api/makecall_submenu/?id=171&forwarding_number=XXXXXXXXX
 
     Response:
@@ -331,6 +331,25 @@ Four Section
             "status": "fail",
             "message": "menu is completed already.",
             "fs_output": ""
+        }
+
+```
+
+    # To send SMS, we can use this api
+
+    example:
+```
+    curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" \
+        -H "Content-Type: application/x-www-form-urlencoded"
+        -X POST -d "sms_to=1786XXX86XX&sms_body=hello"
+        https://phoneai.boomslang.io/api/sendsms/
+
+    Response:
+        {
+            "id": 7,
+            "sms_to": "1786XXX86XX",
+            "sms_body": "hello",
+            "status": 0
         }
 
 ```
