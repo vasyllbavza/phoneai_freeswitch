@@ -14,6 +14,7 @@ from api.models import (
     CallMenu,
     PhoneNumber,
     SMSLog,
+    IncomingSMS,
 )
 from api.views import freeswitch_execute
 
@@ -228,4 +229,12 @@ class SMSLogAdmin(admin.ModelAdmin):
     ]
 
 admin.site.register(SMSLog, SMSLogAdmin)
+
+class IncomingSMSAdmin(admin.ModelAdmin):
+    list_display = ('id', 'smslog', 'sms_from', 'sms_to', 'sms_body', 'sms_id', 'updated_at')
+    list_filter = [
+        "created_at",
+    ]
+
+admin.site.register(IncomingSMS, IncomingSMSAdmin)
 
