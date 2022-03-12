@@ -27,6 +27,7 @@ from api.models import (
 from api.utils import (
     TreeNode,
     send_sms,
+    post_webhook,
 )
 from api.serializer import (
     CallLogSerializer,
@@ -496,6 +497,18 @@ class IncomingSMSView(APIView):
                 sms_id = smsId,
             )
             smsIn.save()
+            try:
+                row = SMSLog.objects.filter(sms_to=postdata['from']).order_by('-id').first()
+                if row:
+                    smsIn.smslog = row
+                    smsIn.save()
+                    data = {}
+                    data['from'] = smsIn.sms_from
+                    data['to'] = smsIn.sms_to
+                    data['text'] = smsIn.sms_body
+                    post_webhook(smsIn.callback_url, data)
+            except:
+                pass
             content = {}
             content["status"] = "ok"
             return Response(content, status=status.HTTP_200_OK)

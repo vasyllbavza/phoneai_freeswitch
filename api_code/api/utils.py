@@ -1,5 +1,6 @@
 import json
 from flowroutenumbersandmessaging.flowroutenumbersandmessaging_client import FlowroutenumbersandmessagingClient
+import requests
 
 class TreeNode(dict):
 
@@ -52,3 +53,24 @@ def send_sms(to_number, sms_text):
     print(request_body)
     result = messages_controller.send_a_message(request_body)
     return result
+
+def post_webhook(url, data):
+
+    try:
+        str = json.dumps(data)
+        datajson = json.loads(str)
+        try:
+            response = requests.post(url, json=datajson)
+            if response.ok:
+                print("webhook[%s] sent. response = %s" %(url, response.content))
+            else:
+                print("webhook sent failed !!!!!")
+            print("webhook submit -> done")
+        except:
+            pass
+
+    except Exception:
+        print("Exception: webhook sent failed !!!!!")
+        pass
+
+    return True
