@@ -22,6 +22,7 @@ from api.models import (
     PhoneNumber,
     SMSLog,
     SMSStatus,
+    IncomingSMS,
 )
 from api.utils import (
     TreeNode,
@@ -470,6 +471,31 @@ class SMSDLRView(APIView):
             sms.dlr_code = postdata['attributes']['status_code']
             sms.status = SMSStatus.SUCCESS
             sms.save()
+            content = {}
+            content["status"] = "ok"
+            return Response(content, status=status.HTTP_200_OK)
+        except:
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class IncomingSMSView(APIView):
+# {
+#     body: Hello,
+#     to: 14582037530,
+#     from: 17866648610,
+#     id: mdr2-e37cd30f131440278d1048ac6b387b0b
+# }
+    def post(self,request,format=None):
+
+        try:
+            postdata = request.data
+            smsId = postdata['id']
+            smsIn = IncomingSMS(
+                sms_from = postdata['from'],
+                sms_to = postdata['to'],
+                sms_body = postdata['body'],
+                sms_id = smsId,
+            )
+            smsIn.save()
             content = {}
             content["status"] = "ok"
             return Response(content, status=status.HTTP_200_OK)

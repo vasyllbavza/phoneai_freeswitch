@@ -174,3 +174,22 @@ class SMSLog(models.Model):
         managed = True
         verbose_name = 'SMS Log'
         verbose_name_plural = 'SMS Logs'
+
+class IncomingSMS(models.Model):
+
+    sms_from = models.CharField(max_length=20)
+    sms_to = models.CharField(max_length=20)
+    sms_body = models.CharField(max_length=140)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+    smslog = models.ForeignKey(SMSLog, on_delete=models.CASCADE, null=True)
+    sms_id = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.sms_from} [{self.sms_body}]"
+
+    class Meta:
+        db_table = 'incoming_sms'
+        managed = True
+        verbose_name = 'Incoming SMS Log'
+        verbose_name_plural = 'Incoming SMS Logs'
