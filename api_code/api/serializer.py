@@ -45,6 +45,7 @@ class SMSSerializer(Serializer):
     id = IntegerField(read_only=True)
     sms_to = CharField(required=True,max_length=20)
     sms_body = CharField(required=True,max_length=140)
+    callback_url = CharField(required=False,max_length=250)
     status = IntegerField(default=0)
 
     def create(self, validated_data):

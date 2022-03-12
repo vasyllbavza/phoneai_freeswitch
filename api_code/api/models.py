@@ -164,6 +164,8 @@ class SMSLog(models.Model):
     sms_result = models.TextField(max_length=500, blank=True, null=True)
     sms_id = models.CharField(max_length=100, blank=True, null=True)
     dlr_code = models.IntegerField(default=0, help_text="https://support.flowroute.com/681766-Delivery-Receipt-Response-Codes")
+    callback_url = models.CharField(max_length=250, blank=True, null=True)
+
     def __str__(self):
         return f"{self.sms_to} [{self.sms_body}]"
 
