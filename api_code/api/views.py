@@ -432,7 +432,7 @@ class SendSMSView(APIView):
         
         return Response(smsdata.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class SMSCallbackView(APIView):
+class SMSDLRView(APIView):
 # {
 #    "data": {
 #        "attributes": {

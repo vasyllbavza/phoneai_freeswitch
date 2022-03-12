@@ -32,7 +32,7 @@ from api.views import (
     PhonenumberView,
     MakeCallSubMenuView,
     SendSMSView,
-    SMSCallbackView,
+    SMSDLRView,
 )
 from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -70,7 +70,7 @@ urlpatterns = [
     path('api/scan/',ScanCallView.as_view()),
     path('api/callmenu/',ShowCallMenu.as_view()),
     path('api/sendsms/',SendSMSView.as_view()),
-    path('api/sms/callback/',SMSCallbackView.as_view()),
+    path('api/sms/callback/',SMSDLRView.as_view()),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
