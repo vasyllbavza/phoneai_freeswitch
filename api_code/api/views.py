@@ -463,6 +463,8 @@ class SMSDLRView(APIView):
 #     id: mdr2-04de8f38c6ee42c7bfd784850277d576,
 #     type: delivery_receipt
 # }
+# {\x22attributes\x22: {\x22to\x22: \x2217866648610\x22, \x22from\x22: \x2214582037530\x22, \x22body\x22: \x22hello there test test 123467\x22, \x22status\x22: \x22smsc submit\x22}, \x22id\x22: \x22mdr2-d616911548734333b3359d8a9b7eef0c\x22, \x22type\x22: \x22delivery_receipt\x22}
+
     def post(self,request,format=None):
 
         try:
@@ -506,7 +508,8 @@ class IncomingSMSView(APIView):
                     data['from'] = smsIn.sms_from
                     data['to'] = smsIn.sms_to
                     data['text'] = smsIn.sms_body
-                    post_webhook(smsIn.callback_url, data)
+                    if row.callback_url:
+                        post_webhook(row.callback_url, data)
             except:
                 pass
             content = {}
