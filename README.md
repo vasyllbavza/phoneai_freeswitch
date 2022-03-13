@@ -339,19 +339,33 @@ Four Section
 
     example:
 ```
-    curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" \
-        -H "Content-Type: application/x-www-form-urlencoded" \
-        -X POST -d "sms_to=1786XXX86XX&sms_body=hello,callback_url=https://domain.xyz/" \
-        https://phoneai.boomslang.io/api/sendsms/
+    curl --location -X POST 'https://phoneai.boomslang.io/api/sendsms/' \
+    -H 'Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd' \
+    -H 'Content-Type: application/json' \
+    -d '{
+        "sms_to": "1786XXX86XX",
+        "sms_body": "hello",
+        "callback_url": "https://webhook.site/da7b7433-e75e-45c1-a81d-d274955b4531"
+    }'
 
     Response:
         {
             "id": 7,
             "sms_to": "1786XXX86XX",
             "sms_body": "hello",
+            "callback_url": "https://webhook.site/da7b7433-e75e-45c1-a81d-d274955b4531"
             "status": 0
         }
 
+```
+
+    # CallBack SMS payload:
+```
+        {
+            "from": "17866648610",
+            "to": "14582037530",
+            "text": "Fydyd"
+        }
 ```
 
 
