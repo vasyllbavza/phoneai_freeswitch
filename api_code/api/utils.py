@@ -54,7 +54,7 @@ def send_sms(to_number, sms_text):
     result = messages_controller.send_a_message(request_body)
     return result
 
-def postX_webhook(url, data):
+def post_webhook(url, data):
 
     try:
         str = json.dumps(data)
@@ -72,16 +72,5 @@ def postX_webhook(url, data):
     except Exception:
         print("Exception: webhook sent failed !!!!!")
         pass
-
-    return True
-
-def post_webhook(url, data):
-    str = json.dumps(data)
-    datajson = json.loads(str)
-    response = requests.post(url, json=datajson)
-    if response.ok:
-        print("webhook[%s] sent. response = %s" %(url, response.content))
-    else:
-        print("webhook sent failed !!!!!")
 
     return True
