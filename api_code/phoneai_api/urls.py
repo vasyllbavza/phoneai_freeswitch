@@ -39,6 +39,7 @@ from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.staticfiles.urls import static
 
+from sipuser.urls import urlpatterns as urlpatterns_sipuser
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -74,6 +75,7 @@ urlpatterns = [
     path('api/sms/callback/',SMSDLRView.as_view()),
     path('api/sms/incoming/',IncomingSMSView.as_view()),
 ]
+urlpatterns += urlpatterns_sipuser
 
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
