@@ -44,7 +44,7 @@ class FsUser(models.Model):
 class Extension(models.Model):
 
     user = models.ForeignKey(FsUser, on_delete=models.CASCADE, related_name="extension_user")
-    sip_username = models.CharField(verbose_name="SIP Username", max_length=100)
+    sip_username = models.CharField(verbose_name="SIP Username", max_length=100, unique=True)
     sip_password = models.CharField(verbose_name="SIP Password", max_length=100)
     
     created_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -83,8 +83,10 @@ class FsProvider(models.Model):
 class FsDidNumber(models.Model):
 
     provider = models.ForeignKey(FsProvider, on_delete=models.CASCADE, related_name="did_provider")
-    phonenumber = models.CharField(verbose_name="DID Number", max_length=20)
+    phonenumber = models.CharField(verbose_name="DID Number", max_length=20, unique=True)
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE, null=TRUE)
+
+    extension = models.ForeignKey(Extension, on_delete=models.CASCADE, null=TRUE)
     
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
