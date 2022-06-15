@@ -52,7 +52,7 @@ class FsProviderAdmin(admin.ModelAdmin):
 admin.site.register(FsProvider, FsProviderAdmin)
 
 class FsDidNumberAdmin(admin.ModelAdmin):
-    list_display = ('provider_name','phonenumber', 'created_at', 'updated_at')
+    list_display = ('provider_name','phonenumber', 'extension', 'created_at')
     list_filter = [
         "domain",
         "created_at",
