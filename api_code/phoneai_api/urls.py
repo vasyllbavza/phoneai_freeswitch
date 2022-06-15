@@ -39,6 +39,7 @@ from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.staticfiles.urls import static
 
+from sipuser.urls import urlpatterns as urlpatterns_sipuser
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -60,6 +61,7 @@ router.register(r'users', UserViewSet)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
+    path('api/admin/admin_tools/', include('admin_tools.urls')),
     path('api/admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -74,6 +76,7 @@ urlpatterns = [
     path('api/sms/callback/',SMSDLRView.as_view()),
     path('api/sms/incoming/',IncomingSMSView.as_view()),
 ]
+urlpatterns += urlpatterns_sipuser
 
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

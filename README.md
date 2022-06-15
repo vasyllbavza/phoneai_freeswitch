@@ -390,3 +390,157 @@ Four Section
 ```
 * * * * * root  /root/py36ENV/bin/python /root/code/phoneai_freeswitch/api_code/call_retry.py > /var/log/call_cron.log 2>&1
 ```
+
+
+# API for Extension and DID phonenumber management
+
+#### List all extensions
+
+Request: [ GET ]
+```
+curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" https://phoneai.boomslang.io/api/extensions/
+```
+
+Response:
+```json
+    [
+        {
+            "id":1,
+            "user_id":1,
+            "sip_username":"1001",
+            "sip_password":"123456",
+            "domain":"phoneai.boomslang.io"
+            "updated_at":"2022-06-12T07:39:43.647443Z",
+        },
+        {
+            "id":2,
+            "user_id":1,
+            "sip_username":"1002",
+            "sip_password":"123456",
+            "domain":"phoneai.boomslang.io"
+            "updated_at":"2022-06-15T03:45:17.977388Z",
+        }
+    ]
+```
+
+#### GET etension inforation
+Request: [ GET ]
+```
+curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" https://phoneai.boomslang.io/api/extensions/1
+```
+
+Response:
+```json
+    {
+        "id":1,
+        "user_id":1,
+        "sip_username":"1001",
+        "sip_password":"123456",
+        "domain":"phoneai.boomslang.io"
+        "updated_at":"2022-06-12T07:39:43.647443Z",
+    },
+```
+
+#### DELETE etension inforation
+Request: [ DELETE ]
+```
+curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" https://phoneai.boomslang.io/api/extensions/1/
+```
+
+#### Create etensions
+Request: [ POST ]
+```
+curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" https://phoneai.boomslang.io/api/extensions/
+```
+
+payload
+```
+{
+    "sip_username": "1003",
+    "sip_password": "123456"
+}
+```
+
+
+## LIST DID phonenumber
+Request: [ GET ]
+```
+curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" https://phoneai.boomslang.io/api/did_numbers/
+```
+
+Response:
+```json
+    [
+        {
+            "id": 1,
+            "provider": 1,
+            "phonenumber": "14582037530",
+            "domain": "phoneai.boomslang.io",
+            "extension": null,
+            "created_at": "2022-06-12T07:35:50.947110Z"
+        },
+        {
+            "id": 2,
+            "provider": 1,
+            "phonenumber": "17862062698",
+            "domain": "phoneai.boomslang.io",
+            "extension": 1,
+            "created_at": "2022-06-15T03:59:05.370107Z"
+        }
+    ]
+```
+
+## Search puchasable phoenenumber from Flowroute
+
+Request: [ GET ]
+```
+curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" https://phoneai.boomslang.io/api/did_numbers/search/?npa=786&limit=4
+```
+params
+```
+npa: area code to search for
+limit: that will list available number
+```
+Response:
+```json
+    {
+        "data": [
+            {
+                "number": "17862062699",
+                "monthly_cost": 0.5
+            },
+            {
+                "number": "17862062701",
+                "monthly_cost": 0.5
+            },
+            {
+                "number": "17862062704",
+                "monthly_cost": 0.5
+            },
+            {
+                "number": "17862062782",
+                "monthly_cost": 0.5
+            }
+        ]
+    }
+```
+
+## Complete Buy puchasable phoenenumber and Assigned to extension
+
+Request: [ POST ]
+```
+curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" https://phoneai.boomslang.io/api/did_numbers/
+```
+
+payload
+```
+{
+    "phonenumber": "17862062698",
+    "extension": 1
+}
+```
+
+Response:
+```
+201 Created.
+```
