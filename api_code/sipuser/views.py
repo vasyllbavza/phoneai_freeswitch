@@ -182,6 +182,13 @@ class DidNumberViewSet(ModelViewSet):
     )
     def search(self, request, pk=None):
         npa = self.request.query_params.get('npa')
+        try:
+            limit = self.request.query_params.get('limit')
+            if not limit:
+                limit = 10
+        except:
+            limit = 10
+
         number_list = []
         provider = FsProvider.objects.first()
         if provider.name == "Flowroute":
@@ -193,7 +200,7 @@ class DidNumberViewSet(ModelViewSet):
                 starts_with = npa
                 contains = None
                 ends_with = None
-                limit = 3
+                # limit = 10
                 offset = None
                 rate_center = None
                 state = None
