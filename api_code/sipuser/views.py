@@ -20,9 +20,10 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from .models import Domain, Extension, FsUser, FsProvider, FsDidNumber
+from .models import Domain, Extension, FsCDR, FsUser, FsProvider, FsDidNumber
 
 from .serializers import (
+    CdrSerializer,
     ExtensionCreateSerializer,
     ExtensionSerializer,
     ExtensionUpdateSerializer,
@@ -48,6 +49,7 @@ class ExtensionFilter(FilterSet):
             return queryset.filter(user_id=value)
 
         return queryset.filter(pbx__pbx_uuid=value)
+
 
 class ExtensionViewSet(ModelViewSet):
 
@@ -94,6 +96,7 @@ class ExtensionViewSet(ModelViewSet):
             return ExtensionUpdateSerializer
         return super().get_serializer_class()
 
+
 class DidNumberViewSet(ModelViewSet):
 
     permission_classes = [IsAuthenticated]
@@ -135,11 +138,11 @@ class DidNumberViewSet(ModelViewSet):
                 request_body = '{ \
                     "data": { \
                         "type": "route", \
-                        "id": "' + str(prirouteid) +'" \
+                        "id": "' + str(prirouteid) + '" \
                     } \
                 }'
                 routes_controller = client.routes
-                print ("---Update Primary Voice Route")
+                print("---Update Primary Voice Route")
                 result = routes_controller.update_primary_voice_route(purchasable_number, request_body)
                 if result is None:
                     print("204: No Content")
@@ -149,9 +152,7 @@ class DidNumberViewSet(ModelViewSet):
                 serializer.save(provider=provider, domain=domain)
             except:
                 logger.exception("error found in purchase")
-            
-            
-        
+
         # fsuser = FsUser.objects.get(user_id=self.request.user.id)
         # serializer.save(user_id=fsuser.id)
 
@@ -222,3 +223,36 @@ class DidNumberViewSet(ModelViewSet):
                 logger.exception("Error found")
 
         return Response({"data": number_list})
+
+
+class CdrViewSet(ModelViewSet):
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    queryset = FsCDR.objects.none()
+    serializer_class = CdrSerializer
+    search_fields = [
+    ]
+    # filterset_class = ExtensionFilter
+    ordering_fields = [
+        "id",
+    ]
+
+    # MARK: - Overrides
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [IsAuthenticated()]
+        return super().get_permissions()
+
+    def get_queryset(self):
+        return FsCDR.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = CdrSerializer(instance)
+        logger.info(f"PHI: User (id: {request.user.id}) accessed cdr (id: {instance.id}).")
+        return Response(serializer.data)
+
+    def get_serializer_class(self):
+        return super().get_serializer_class()

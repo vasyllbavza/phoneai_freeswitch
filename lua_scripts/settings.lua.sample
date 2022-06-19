@@ -1,0 +1,6 @@
+---------------
+-- settings.lua
+--
+
+DEFAULT_CALLERID = "14582037530"
+

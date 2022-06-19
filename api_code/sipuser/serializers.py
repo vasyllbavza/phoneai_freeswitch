@@ -4,8 +4,9 @@ from rest_framework.serializers import (
     SerializerMethodField,
     ValidationError,
 )
+from django.conf import settings
 
-from .models import Extension, FsDidNumber, FsUser
+from .models import Extension, FsDidNumber, FsUser, FsCDR
 
 
 class ExtensionCreateSerializer(ModelSerializer):
@@ -78,6 +79,7 @@ class ExtensionSerializer(ModelSerializer):
 
         return representation
 
+
 class ExtensionRetrieveSerializer(ModelSerializer):
     class Meta:
         model = Extension
@@ -117,8 +119,8 @@ class ExtensionUpdateSerializer(ModelSerializer):
             "sip_password",
         ]
 
-### FS DID number
 
+### FS DID number
 class DidNUmberSerializer(ModelSerializer):
     class Meta:
         model = FsDidNumber
@@ -137,6 +139,7 @@ class DidNUmberSerializer(ModelSerializer):
         representation['domain'] = instance.domain.domain
 
         return representation
+
 
 class DidNUmberCreateSerializer(ModelSerializer):
     class Meta:
@@ -172,7 +175,38 @@ class DidNUmberCreateSerializer(ModelSerializer):
             pass
         raise ValidationError("A valid value is required.")
 
+
 class DidNumberSearchSerializer(ModelSerializer):
     class Meta:
         model = FsDidNumber
         fields = []
+
+
+class CdrSerializer(ModelSerializer):
+    class Meta:
+        model = FsCDR
+        fields = [
+            "id",
+            "domain",
+            "call_direction",
+            "call_uuid",
+            "didnumber",
+            "call_from",
+            "call_to",
+            "extension",
+            "bill_duration",
+            "recording",
+            "hangup_cause",
+            "started_at",
+            "created_at",
+        ]
+
+    # MARK: - Properties
+
+    # MARK: - Methods
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['domain'] = instance.domain.domain
+        # representation['category'] = CategorySerializer(instance.category).data
+        return representation

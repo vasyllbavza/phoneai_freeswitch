@@ -544,3 +544,78 @@ Response:
 ```
 201 Created.
 ```
+
+
+## List CDR - Call Detail Records
+
+Request: [ GET ]
+```
+curl -H "Authorization: Token 9c66b4539c522dbb19f390e902e501eebbc1adcd" https://phoneai.boomslang.io/api/cdrs/
+```
+
+Response:
+```json
+[
+    {
+        "id": 18,
+        "domain": "phoneai.boomslang.io",
+        "call_direction": "outbound",
+        "call_uuid": "8e04cf58-efe4-11ec-9ea4-a593d3cd889e",
+        "didnumber": null,
+        "call_from": "1002",
+        "call_to": "17866648610",
+        "extension": 2,
+        "bill_duration": 8,
+        "recording": "/api/media/domain_1/2_8e04cf58-efe4-11ec-9ea4-a593d3cd889e.mp3",
+        "hangup_cause": "NORMAL_CLEARING",
+        "started_at": "2022-06-19T08:29:06Z",
+        "created_at": "2022-06-19T15:29:23.099776Z"
+    },
+    {
+        "id": 19,
+        "domain": "phoneai.boomslang.io",
+        "call_direction": "inbound",
+        "call_uuid": "ba2f4086-efe4-11ec-9ec9-a593d3cd889e",
+        "didnumber": 3,
+        "call_from": "+17866648610",
+        "call_to": "+17862062699",
+        "extension": 2,
+        "bill_duration": 16,
+        "recording": "/api/media/domain_1/2_ba2f4086-efe4-11ec-9ec9-a593d3cd889e.mp3",
+        "hangup_cause": "NORMAL_CLEARING",
+        "started_at": "2022-06-19T08:30:19Z",
+        "created_at": "2022-06-19T15:30:38.724396Z"
+    },
+    {
+        "id": 20,
+        "domain": "phoneai.boomslang.io",
+        "call_direction": "outbound",
+        "call_uuid": "ad5b5bb2-eff1-11ec-9f17-a593d3cd889e",
+        "didnumber": null,
+        "call_from": "1001",
+        "call_to": "812093988010",
+        "extension": 1,
+        "bill_duration": 0,
+        "recording": "",
+        "hangup_cause": "NORMAL_CLEARING",
+        "started_at": "2022-06-19T10:03:01Z",
+        "created_at": "2022-06-19T17:03:01.765077Z"
+    },
+    {
+        "id": 21,
+        "domain": "phoneai.boomslang.io",
+        "call_direction": "outbound",
+        "call_uuid": "da0e68a4-eff4-11ec-9f2f-a593d3cd889e",
+        "didnumber": null,
+        "call_from": "1001",
+        "call_to": "8442037691714",
+        "extension": 1,
+        "bill_duration": 0,
+        "recording": "",
+        "hangup_cause": "NORMAL_CLEARING",
+        "started_at": "2022-06-19T10:25:45Z",
+        "created_at": "2022-06-19T17:25:45.257540Z"
+    }
+]
+```
+

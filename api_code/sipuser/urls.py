@@ -1,10 +1,10 @@
 from django.db import router
-from django.urls import path,include
 from rest_framework.routers import SimpleRouter
 
-from .views import ExtensionViewSet, DidNumberViewSet
+from .views import CdrViewSet, ExtensionViewSet, DidNumberViewSet
 
 router = SimpleRouter()
+router.register("api/cdrs", CdrViewSet)
 router.register("api/extensions", ExtensionViewSet)
 router.register("api/did_numbers", DidNumberViewSet)
 
