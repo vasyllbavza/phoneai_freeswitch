@@ -79,6 +79,8 @@ class FsCDRAdmin(admin.ModelAdmin):
         'domain',
         'call_uuid',
         'call_direction',
+        'is_verified',
+        'in_contact',
         'call_from',
         'call_to',
         'didnumber',
@@ -86,11 +88,11 @@ class FsCDRAdmin(admin.ModelAdmin):
         'recording_player',
         'created_at'
     )
-    list_filter = [
-        "domain",
-        'didnumber',
-        "created_at",
-    ]
+    # list_filter = [
+    #     "domain",
+    #     'didnumber',
+    #     "created_at",
+    # ]
 
     search_fields = ['call_uuid'', call_from', 'call_to']
 

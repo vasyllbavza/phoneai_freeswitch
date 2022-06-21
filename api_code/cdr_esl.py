@@ -151,6 +151,10 @@ def save_cdr_local(cdrdata):
             pass
     cdrlog.recording_file = cdrdata["phoneai_record_file"]
     cdrlog.hangup_cause = cdrdata["hangup_cause"]
+
+    cdrlog.is_verified = cdrdata["caller_is_verified"]
+    cdrlog.in_contact = cdrdata["caller_in_contact"]
+
     # cdrlog.read_codec = cdr['read_codec']
     # cdrlog.write_codec = cdr['write_codec']
     # if cdr['mango_record_seconds'] > 0:
@@ -277,6 +281,9 @@ try:
 
                     cdr['call_to'] = get_event_variable(e, "caller_destination", "string")
                     cdr['call_from'] = get_event_variable(e, "caller_id_number", "string")
+
+                    cdr['caller_is_verified'] = get_event_variable(e, "caller_is_verified", "int")
+                    cdr['caller_in_contact'] = get_event_variable(e, "caller_in_contact", "int")
 
                     cdr['leg'] = 'A'
                     try:

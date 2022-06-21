@@ -40,6 +40,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.staticfiles.urls import static
 
 from sipuser.urls import urlpatterns as urlpatterns_sipuser
+from contacts.urls import urlpatterns as urlpatterns_contact
+
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -47,10 +49,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ['url', 'username', 'email', 'is_staff']
 
+
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
@@ -67,16 +71,17 @@ urlpatterns = [
     path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # path('status/'), FreeswitchStatus.as_view()),
     path('api/hello/', HelloView.as_view(), name='hello'),
-    path('api/phonenumber/',PhonenumberView.as_view()),
-    path('api/makecall/',MakeCallView.as_view()),
-    path('api/makecall_submenu/',MakeCallSubMenuView.as_view()),
-    path('api/scan/',ScanCallView.as_view()),
-    path('api/callmenu/',ShowCallMenu.as_view()),
-    path('api/sendsms/',SendSMSView.as_view()),
-    path('api/sms/callback/',SMSDLRView.as_view()),
-    path('api/sms/incoming/',IncomingSMSView.as_view()),
+    path('api/phonenumber/', PhonenumberView.as_view()),
+    path('api/makecall/', MakeCallView.as_view()),
+    path('api/makecall_submenu/', MakeCallSubMenuView.as_view()),
+    path('api/scan/', ScanCallView.as_view()),
+    path('api/callmenu/', ShowCallMenu.as_view()),
+    path('api/sendsms/', SendSMSView.as_view()),
+    path('api/sms/callback/', SMSDLRView.as_view()),
+    path('api/sms/incoming/', IncomingSMSView.as_view()),
 ]
 urlpatterns += urlpatterns_sipuser
+urlpatterns += urlpatterns_contact
 
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

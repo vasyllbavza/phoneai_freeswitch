@@ -7,6 +7,7 @@
     we may need to add some AI assistant logics
 ]]
 function parse_watson_xmlstr(speechStr)
+    if speechStr == nil or speechStr == "" then return ""; end
     confidenceVal = string.match(speechStr, "<interpretation .* confidence=\"(%d+.%d+)\">");
     if confidenceVal ~= nil or confidenceVal ~= "" then
         confidenceVal = tonumber(confidenceVal)

@@ -136,6 +136,9 @@ class FsCDR(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
+    is_verified = models.BooleanField(default=False)
+    in_contact = models.BooleanField(default=False)
+
     class Meta:
         db_table = 'fs_cdr'
         managed = True

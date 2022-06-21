@@ -194,6 +194,8 @@ class CdrSerializer(ModelSerializer):
             "call_from",
             "call_to",
             "extension",
+            "is_verified",
+            "in_contact",
             "bill_duration",
             "recording",
             "hangup_cause",
@@ -207,6 +209,9 @@ class CdrSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['domain'] = instance.domain.domain
+        try:
+            representation['domain'] = instance.domain.domain
+        except:
+            pass
         # representation['category'] = CategorySerializer(instance.category).data
         return representation

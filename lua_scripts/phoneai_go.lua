@@ -7,6 +7,8 @@ require "app.phoneai.utils";
 
 --variables
 --
+caller_id = '14582037530'
+
 dtmf_input = "";
 ivr_menu_digit_len = "10";
 recordfile = "/usr/share/freeswitch/scripts/recorded_audio.wav";
@@ -33,14 +35,18 @@ if destination_number == nil then destination_number = ""; end
 call_menu_id = session:getVariable("call_menu_id");
 freeswitch.consoleLog("info", "call_menu_id = " .. call_menu_id .. "\n");
 
+forwarding_number = session:getVariable("forwarding_number");
+agentcall_id = session:getVariable("agentcall_id");
+
 --event data object
 local evtdata = {};
-evtdata["action"] = "call_started";
+evtdata["action"] = "go_call_started";
 evtdata['number_id'] = phoneai_number_id;
 evtdata['call_id'] = phoneai_call_id;
 evtdata['call_uuid'] = uuid;
 evtdata['call_menu_id'] = call_menu_id;
 evtdata['is_new_call'] = is_new_call;
+evtdata['agentcall_id'] = agentcall_id;
 
 mydtbd_send_event(evtdata);
 
@@ -95,7 +101,7 @@ function dtmf_to_press(key_collected)
     end
     return nil
 end
--- after execute/press dtmf, we will remove that
+-- after execute/press dtmf, we will remove that 
 -- from key_travel channel variable
 --
 function update_key_travel()
@@ -106,6 +112,7 @@ function update_key_travel()
         key_travel = ""
     end
     session:setVariable("key_travel", key_travel);
+    return key_travel
 end
 function key_check(speech)
 
@@ -157,7 +164,7 @@ function onInput(s, type, obj)
                 if xmlstr ~= nil then
                     speech = parse_watson_xmlstr(xmlstr);
                     speech_found = speech_found .. " "..speech;
-                    freeswitch.consoleLog("ERR", "\n" .. speech .. "\n");
+                    freeswitch.consoleLog("ERR", "\n" .. speech .. "\n");               
                     freeswitch.consoleLog("ERR", "\n" .. speech_found .. "\n");
                     new_key = key_check(speech);
                     key_collected = key_collected..new_key;
@@ -227,7 +234,7 @@ if (session:ready()) then
         local key_to_send = dtmf_to_press(key_collected);
         if key_to_send ~= nil then
             session:execute("send_dtmf",key_to_send);
-            update_key_travel();
+            local key_rem = update_key_travel();
 
             --event data object
             local evtdata = {};
@@ -238,6 +245,7 @@ if (session:ready()) then
             evtdata['call_menu_id'] = call_menu_id;
             evtdata['current_menu_id'] = current_menu_id;
             evtdata['keys'] = key_to_send;
+            evtdata['agentcall_id'] = agentcall_id;
             mydtbd_send_event(evtdata);
             --end
 
@@ -248,6 +256,20 @@ if (session:ready()) then
             speaking_start = 0;
             speech_found = "";
             key_collected = "";
+            if key_rem == "" then
+                -- going to transfer this calls to forwarding number
+                freeswitch.consoleLog("ERR", "transfer calls to agent with forwading number = " .. forwarding_number .."\n");
+                dialstring = "{ignore_early_media=true,origination_caller_id_number="..caller_id.."}"
+                if forwarding_number:len() < 7 then
+                    dialstring = dialstring.."user/"..forwarding_number;
+                else
+                    dialstring = dialstring.."sofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*"..forwarding_number;
+                end
+                freeswitch.consoleLog("ERR", "dialstring = " .. dialstring .."\n");
+                session:execute("set","hangup_after_bridge=true");
+                session:execute("bridge", dialstring);
+                session:hangup();
+            end
             goto continue
         end
         if speaking_start > 0 then
@@ -283,14 +305,14 @@ if (session:ready()) then
 
                     -- send silence detected event to [call_esl.py]
                     -- which will initiate dtmf witH ESL interface
-                    mydtbd_send_event(evtdata);
+                    -- mydtbd_send_event(evtdata);
                     wait_time_missed = 0;
                     menu_ready_for_input = 0;
                     idle_start_time = os.time();
                 else
                     evtdata["key_collected"] = "0";
                     evtdata["audio_text"] = speech_found;
-                    mydtbd_send_event(evtdata);
+                    -- mydtbd_send_event(evtdata);
                     freeswitch.consoleLog("ERR", "silence_detected with no key collected\n");
                     wait_time_missed = wait_time_missed + 1;
                     freeswitch.consoleLog("INFO", "wait_time_missed= "..wait_time_missed.."\n");
@@ -307,7 +329,7 @@ if (session:ready()) then
                 if wait_time > 30 then
                     force_hangup = 1;
                     freeswitch.consoleLog("INFO", "clean up call.\n");
-                end
+                end    
             end
         else
             no_audio_wait_time = os.time() - idle_start_time;
@@ -319,7 +341,6 @@ if (session:ready()) then
         end
         ::continue::
     end
-    -- session:execute("play_and_detect_speech",sound.." detect:unimrcp:watson {start-input-timers=false}builtin:speech/transcribe");
     local xml = session:getVariable('detect_speech_result')
     if xml ~= nil then
             speechStr = xml;
@@ -327,7 +348,7 @@ if (session:ready()) then
     end
 
     local evtdata = {};
-    evtdata["action"] = "call_ended";
+    evtdata["action"] = "go_call_ended";
     evtdata['call_id'] = phoneai_call_id;
     evtdata['call_uuid'] = uuid;
     evtdata["call_menu_id"] = call_menu_id;
@@ -335,6 +356,7 @@ if (session:ready()) then
     evtdata["record_uuid"] = record_uuid;
     evtdata["key_level"] = key_level;
     evtdata["force_hangup"] = force_hangup
+    evtdata['agentcall_id'] = agentcall_id;
     mydtbd_send_event(evtdata);
     session:hangup();
 end
