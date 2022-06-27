@@ -58,6 +58,13 @@ local destination_number = session:getVariable("destination_number")
 local caller_id_number = session:getVariable("caller_id_number")
 local call_uuid = session:getVariable("uuid")
 local force_captcha = session:getVariable("force_captcha")
+
+-- track internal callmenu transfer call
+--
+if caller_id_number == DEFAULT_CALLERID then
+    force_captcha = "true"
+end
+
 --[[
 variable_sip_P-Asserted-Identity: [+17866648610;verstat=TN-Validation-Passed]
 variable_sip_name_params: [verstat=TN-Validation-Passed]
