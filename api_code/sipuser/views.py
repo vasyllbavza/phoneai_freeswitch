@@ -21,6 +21,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from .models import Domain, Extension, FsCDR, FsUser, FsProvider, FsDidNumber
+from contacts.models import Phonebook
 
 from .serializers import (
     CdrSerializer,
@@ -77,7 +78,12 @@ class ExtensionViewSet(ModelViewSet):
     def perform_create(self, serializer):
         print(self.request.user)
         fsuser = FsUser.objects.get(user_id=self.request.user.id)
-        serializer.save(user_id=fsuser.id)
+        data = serializer.save(user_id=fsuser.id)
+        print(data)
+        phonebook = Phonebook(name="PB%s" % str(fsuser.id))
+        ext = Extension.objects.get(pk=data.id)
+        phonebook.extension = ext
+        phonebook.save()
 
     def perform_destroy(self, instance):
         print(f"User (id: {self.request.user.id}) deleted extension (id: {instance.id}).")
