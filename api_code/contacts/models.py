@@ -20,9 +20,9 @@ class Phonebook(models.Model):
 
 
 CONTACT_CHOICES = (
-    ("API", "api"),
-    ("CAPTCHA", "captcha"),
-    ("OUTBOUND", "outbound"),
+    ("api", "api"),
+    ("captcha", "captcha"),
+    ("outbound", "outbound"),
 )
 
 
