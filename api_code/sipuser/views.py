@@ -80,7 +80,7 @@ class ExtensionViewSet(ModelViewSet):
         fsuser = FsUser.objects.get(user_id=self.request.user.id)
         data = serializer.save(user_id=fsuser.id)
         print(data)
-        phonebook = Phonebook(name="PB%s" % str(fsuser.id))
+        phonebook = Phonebook(name="PB%s" % str(data.id))
         ext = Extension.objects.get(pk=data.id)
         phonebook.extension = ext
         phonebook.save()

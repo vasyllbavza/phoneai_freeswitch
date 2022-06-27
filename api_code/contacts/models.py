@@ -5,7 +5,7 @@ from sipuser.models import Extension
 class Phonebook(models.Model):
 
     extension = models.ForeignKey(Extension, on_delete=models.CASCADE, related_name="phonebook_extension")
-    name = models.CharField(verbose_name="Phonebook Nmae", max_length=100, unique=True)
+    name = models.CharField(verbose_name="Phonebook Nmae", max_length=100)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
