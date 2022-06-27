@@ -19,10 +19,18 @@ class Phonebook(models.Model):
         return "%s" % self.name
 
 
+CONTACT_CHOICES = (
+    ("API", "api"),
+    ("CAPTCHA", "captcha"),
+    ("OUTBOUND", "outbound"),
+)
+
+
 class Contacts(models.Model):
 
     phonebook = models.ForeignKey(Phonebook, on_delete=models.CASCADE, related_name="contact_phonebook")
     phonenumber = models.CharField(verbose_name="Phonenumber", max_length=50, unique=True)
+    source = models.CharField(max_length=10, choices=CONTACT_CHOICES, default="API")
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
