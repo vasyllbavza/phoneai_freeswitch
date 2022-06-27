@@ -57,7 +57,6 @@ class ContactsCreateSerializer(ModelSerializer):
             "id",
             "phonebook",
             "phonenumber",
-            "source",
             "active",
         ]
 
@@ -81,6 +80,7 @@ class ContactsSerializer(ModelSerializer):
             "id",
             "phonebook",
             "phonenumber",
+            "source",
             "active",
             "created_at",
             # "updated_at",
