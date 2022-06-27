@@ -138,6 +138,19 @@ if extension_id > 0 then
         if captcha_response ~= nil and captcha_response ~= "" and tonumber(captcha_response) ~= nil then
             if tonumber(captcha_response) ~= (param.number1 + param.number2) then
                 session:hangup();
+            else
+                local phonebook_id = 0;
+                sql = "select phonebooks.id from phonebooks join fs_extension on phonebooks.extension_id=fs_extension.id"
+                sql = sql .. " where phonebooks.extension_id="..extension_id;
+                freeswitch.consoleLog("INFO", sql)
+                dbh:query(sql, function(row)
+                    phonebook_id = tonumber(row['id'])
+                end)
+                sql = "insert into contacts(phonenumber,active,source, phonebook_id) "
+                sql = sql .. " values('"..caller_id_number.."', '1', 'captcha',"..phonebook_id..")"
+                freeswitch.consoleLog("INFO", sql)
+                local result = dbh:query(sql)
+                freeswitch.consoleLog("INFO", inspect(result))
             end
         else
             session:hangup();
