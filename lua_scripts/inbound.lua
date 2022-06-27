@@ -110,7 +110,7 @@ if extension_id > 0 then
     session:execute("set", "caller_in_contact="..caller_in_contact)
     session:execute("export", "caller_in_contact="..caller_in_contact)
 
-    if force_captcha ~= nil or caller_in_contact == 0 then
+    if force_captcha ~= nil or (caller_in_contact == 0 and callerid_verified == 0) then
 
         session:answer()
         session:execute("sleep", "1000")
