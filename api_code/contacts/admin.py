@@ -16,7 +16,7 @@ admin.site.register(Phonebook, PhonebookAdmin)
 
 
 class ContactsAdmin(admin.ModelAdmin):
-    list_display = ('phonebook', 'phonenumber', 'active', 'created_at', 'updated_at')
+    list_display = ('phonebook', 'phonenumber', 'source', 'active', 'created_at', 'updated_at')
     list_filter = [
         "phonebook",
     ]
