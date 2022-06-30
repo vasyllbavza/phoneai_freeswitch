@@ -17,6 +17,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
+from rest_framework import status
 from .models import Phonebook, Contacts
 
 from .serializers import (
@@ -120,3 +122,36 @@ class ContactViewSet(ModelViewSet):
         if self.action in ["partial_update", "update"]:
             return ContactsUpdateSerializer
         return super().get_serializer_class()
+
+
+class NumberLookupView(APIView):
+
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [SessionAuthentication, TokenAuthentication]
+
+    def get(self, request, format=None):
+
+        import plivo
+        number = request.query_params.get('number', '')
+        client = plivo.RestClient(settings.PLIVO_AUTH_ID, settings.PLIVO_AUTH_TOKEN)
+        response = client.lookup.get(number)
+        number_type = response['carrier']['type']
+        number_carrier = response['carrier']['name']
+
+        content = {}
+        content["status"] = "success"
+        content["type"] = number_type
+        content["carrier"] = number_carrier
+        if number_type == "voip":
+            content["status"] = "fail"
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+        if number_carrier == "AT&T":
+            return Response(content, status=status.HTTP_200_OK)
+        if number_carrier == "Verizon Wireless":
+            return Response(content, status=status.HTTP_200_OK)
+        if number_carrier == "T-Mobile US":
+            return Response(content, status=status.HTTP_200_OK)
+
+        content["status"] = "fail"
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
