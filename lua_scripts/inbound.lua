@@ -25,8 +25,8 @@ function check_carrier(number)
     session:execute("curl", "https://phoneai.boomslang.io/api/number/lookup/?number="..number)
     curl_response_code = session:getVariable("curl_response_code")
     curl_response      = session:getVariable("curl_response_data")
-    reeswitch.consoleLog("INFO", inspect(curl_response_code))
-    reeswitch.consoleLog("INFO", inspect(curl_response))
+    freeswitch.consoleLog("INFO", inspect(curl_response_code))
+    freeswitch.consoleLog("INFO", inspect(curl_response))
     if curl_response_code == 200 then
         return 1
     end
