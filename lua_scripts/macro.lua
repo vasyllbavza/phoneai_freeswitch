@@ -13,12 +13,10 @@ function macro(session, name, max_digits, max_timeout, param)
         session:flushDigits();
         --captcha
         if (name == "captcha_ivr") then
-            table.insert(actions, {app="streamFile",data="phoneai/need_to_verify.mp3"});
-            table.insert(actions, {app="streamFile",data="phoneai/captcha_q1.mp3"});
-            table.insert(actions, {app="streamFile",data="phoneai/"..param.number1..".mp3"});
-            table.insert(actions, {app="streamFile",data="phoneai/and.mp3"});
-            table.insert(actions, {app="streamFile",data="phoneai/"..param.number2..".mp3"});
-            table.insert(actions, {app="streamFile",data="phoneai/captcha_q2.mp3"});
+            table.insert(actions, {app="streamFile",data="phoneai/new/captcha_q1.mp3"});
+            table.insert(actions, {app="streamFile",data="phoneai/new/"..param.number1..".wav"});
+            table.insert(actions, {app="streamFile",data="phoneai/new/plus.wav"});
+            table.insert(actions, {app="streamFile",data="phoneai/new/"..param.number2..".wav"});
         end
         --record your message at the tone press any key or stop talking to end the recording
         if (name == "record_message") then
