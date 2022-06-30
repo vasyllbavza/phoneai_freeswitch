@@ -90,7 +90,7 @@ freeswitch.consoleLog("ERR", inspect(sip_pai))
 -- session:execute("info")
 
 callerid_verified = 0
-if check_carrier(caller_id_number) then
+if check_carrier(caller_id_number) == 1 then
     if check_cid_verified(sip_paid) == 1 then
         callerid_verified = 1
     end
