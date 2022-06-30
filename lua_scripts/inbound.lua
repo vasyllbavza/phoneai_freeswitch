@@ -21,6 +21,18 @@ stream_seek = false;
 
 assert(dbh:connected())
 
+function check_carrier(number) then
+    session:execute("curl", "https://phoneai.boomslang.io/api/number/lookup/?number="..number)
+    curl_response_code = session:getVariable("curl_response_code")
+    curl_response      = session:getVariable("curl_response_data")
+    reeswitch.consoleLog("INFO", inspect(curl_response_code))
+    reeswitch.consoleLog("INFO", inspect(curl_response))
+    if curl_response_code == 200 then
+        return 1
+    end
+    return 0
+end
+
 function check_cid_verified(inp_str)
     result = string.find(inp_str, "verstat=TN%-Validation%-Passed")
     if result ~= nil then
@@ -31,7 +43,7 @@ end
 --define on_dtmf call back function
 function on_dtmf(s, type, obj, arg)
     if (type == "dtmf") then
-        freeswitch.console_log("debug", "[voicemail] dtmf digit: " .. obj['digit'] .. ", duration: " .. obj['duration'] .. "\n");
+        freeswitch.consoleLog("debug", "[voicemail] dtmf digit: " .. obj['digit'] .. ", duration: " .. obj['duration'] .. "\n");
         if (obj['digit'] == "#") then
             return 0;
         else
@@ -78,8 +90,10 @@ freeswitch.consoleLog("ERR", inspect(sip_pai))
 -- session:execute("info")
 
 callerid_verified = 0
-if check_cid_verified(sip_paid) == 1 then
-    callerid_verified = 1
+if check_carrier(caller_id_number) then
+    if check_cid_verified(sip_paid) == 1 then
+        callerid_verified = 1
+    end
 end
 session:execute("set", "caller_is_verified="..callerid_verified)
 session:execute("export", "caller_is_verified="..callerid_verified)
