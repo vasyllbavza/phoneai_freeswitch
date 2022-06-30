@@ -21,7 +21,7 @@ stream_seek = false;
 
 assert(dbh:connected())
 
-function check_carrier(number) then
+function check_carrier(number)
     session:execute("curl", "https://phoneai.boomslang.io/api/number/lookup/?number="..number)
     curl_response_code = session:getVariable("curl_response_code")
     curl_response      = session:getVariable("curl_response_data")
