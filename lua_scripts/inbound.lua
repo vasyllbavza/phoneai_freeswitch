@@ -22,7 +22,7 @@ stream_seek = false;
 assert(dbh:connected())
 
 function check_carrier(number)
-    session:execute("curl", "https://phoneai.boomslang.io/api/number/lookup/?number="..number)
+    session:execute("curl", "https://phoneai.boomslang.io/api/number/lookup/?number="..number:sub(-11))
     curl_response_code = session:getVariable("curl_response_code")
     curl_response      = session:getVariable("curl_response_data")
     freeswitch.consoleLog("INFO", inspect(curl_response_code))
