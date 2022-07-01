@@ -28,7 +28,7 @@ function check_carrier(number)
     freeswitch.consoleLog("INFO", inspect(curl_response_code))
     freeswitch.consoleLog("INFO", inspect(curl_response))
     if curl_response ~= nil then
-        session:execute("set", "number_lookup", curl_response)
+        session:execute("set", "number_lookup="..curl_response)
     end
     if curl_response_code == 200 then
         return 1
