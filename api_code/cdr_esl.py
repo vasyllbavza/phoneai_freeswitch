@@ -314,6 +314,13 @@ try:
                         cdr['call_direction'] = e.getHeader("variable_call_direction")
 
                     try:
+                        number_lookup = get_event_variable(e, "number_lookup", "string")
+                        number_data = json.loads(number_lookup)
+                        cdr['caller_type'] = number_data['type']
+                        cdr['caller_carrier'] = number_data['carrier']
+                    except:
+                        pass
+                    try:
                         if cdr['leg'] == 'A':
                             print(cdr)
                             save_cdr_local(cdr)

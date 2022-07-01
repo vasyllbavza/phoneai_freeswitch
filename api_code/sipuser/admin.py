@@ -79,6 +79,8 @@ class FsCDRAdmin(admin.ModelAdmin):
         'domain',
         'call_uuid',
         'call_direction',
+        'caller_type',
+        'caller_carrier',
         'is_verified',
         'in_contact',
         'call_from',

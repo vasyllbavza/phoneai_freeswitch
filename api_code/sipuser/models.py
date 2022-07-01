@@ -139,6 +139,9 @@ class FsCDR(models.Model):
     is_verified = models.BooleanField(default=False)
     in_contact = models.BooleanField(default=False)
 
+    caller_type = models.CharField(max_length=100, default='')
+    caller_carrier = models.CharField(max_length=100, default='')
+
     class Meta:
         db_table = 'fs_cdr'
         managed = True
