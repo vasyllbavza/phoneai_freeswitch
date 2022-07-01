@@ -155,6 +155,12 @@ def save_cdr_local(cdrdata):
     cdrlog.is_verified = cdrdata["caller_is_verified"]
     cdrlog.in_contact = cdrdata["caller_in_contact"]
 
+    try:
+        cdrlog.caller_type = cdrdata["caller_type"]
+        cdrlog.caller_carrier = cdrdata["caller_carrier"]
+    except:
+        pass
+
     # cdrlog.read_codec = cdr['read_codec']
     # cdrlog.write_codec = cdr['write_codec']
     # if cdr['mango_record_seconds'] > 0:
