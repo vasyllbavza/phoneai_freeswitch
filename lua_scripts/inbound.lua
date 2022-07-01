@@ -27,13 +27,16 @@ function check_carrier(number)
     curl_response      = session:getVariable("curl_response_data")
     freeswitch.consoleLog("INFO", inspect(curl_response_code))
     freeswitch.consoleLog("INFO", inspect(curl_response))
+    if curl_response ~= nil then
+        session:execute("set", "number_lookup", curl_response)
+    end
     if curl_response_code == 200 then
         return 1
     end
     return 0
 end
 
-function check_cid_verified(inp_str)
+function check_stir_shaken_verified(inp_str)
     result = string.find(inp_str, "verstat=TN%-Validation%-Passed")
     if result ~= nil then
         return 1
@@ -90,8 +93,8 @@ freeswitch.consoleLog("ERR", inspect(sip_pai))
 -- session:execute("info")
 
 callerid_verified = 0
-if check_carrier(caller_id_number) == 1 then
-    if check_cid_verified(sip_paid) == 1 then
+if check_stir_shaken_verified(sip_paid) == 1 then
+    if check_carrier(caller_id_number) == 1 then
         callerid_verified = 1
     end
 end
