@@ -137,6 +137,7 @@ class NumberLookupView(APIView):
         response = client.lookup.get(number)
         number_type = response['carrier']['type']
         number_carrier = response['carrier']['name']
+        number_carrier = number_carrier.lower()
 
         content = {}
         content["status"] = "success"
@@ -146,12 +147,25 @@ class NumberLookupView(APIView):
             content["status"] = "fail"
             return Response(content, status=status.HTTP_404_NOT_FOUND)
 
-        if number_carrier == "AT&T":
+        if number_carrier.find("at&t") > -1:
             return Response(content, status=status.HTTP_200_OK)
-        if number_carrier == "Verizon Wireless":
+        if number_carrier.find("t-mobile") > -1:
             return Response(content, status=status.HTTP_200_OK)
-        if number_carrier == "T-Mobile US":
+        if number_carrier.find("verizon") > -1:
             return Response(content, status=status.HTTP_200_OK)
+        if number_carrier.find("xfinity") > -1:
+            return Response(content, status=status.HTTP_200_OK)
+        if number_carrier.find("spectrum") > -1:
+            return Response(content, status=status.HTTP_200_OK)
+        if number_carrier.find("us cellular") > -1:
+            return Response(content, status=status.HTTP_200_OK)
+
+        # if number_carrier.find("Visible") > -1:
+        #     return Response(content, status=status.HTTP_200_OK)
+        # if number_carrier.find("Mint") > -1:
+        #     return Response(content, status=status.HTTP_200_OK)
+        # if number_carrier.find("Red Pocket") > -1:
+        #     return Response(content, status=status.HTTP_200_OK)
 
         content["status"] = "fail"
         return Response(content, status=status.HTTP_404_NOT_FOUND)
