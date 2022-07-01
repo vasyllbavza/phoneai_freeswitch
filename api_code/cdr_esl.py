@@ -86,7 +86,7 @@ def get_event_variable(event, var, type):
     try:
         result = get_header(event, "variable_%s" % var)
         if type == 'string':
-            return result 
+            return result
         elif type == 'float':
             return float(result)
         elif type == 'int':
@@ -160,6 +160,8 @@ def save_cdr_local(cdrdata):
         cdrlog.caller_carrier = cdrdata["caller_carrier"]
     except:
         pass
+
+    cdrlog.captcha_verified = cdrdata["captcha_verified"]
 
     # cdrlog.read_codec = cdr['read_codec']
     # cdrlog.write_codec = cdr['write_codec']
@@ -326,6 +328,7 @@ try:
                         cdr['caller_carrier'] = number_data['carrier']
                     except:
                         pass
+                    cdr['captcha_verified'] = get_event_variable(e, "captcha_verified", "int")
                     try:
                         if cdr['leg'] == 'A':
                             print(cdr)

@@ -142,6 +142,8 @@ class FsCDR(models.Model):
     caller_type = models.CharField(max_length=100, default='')
     caller_carrier = models.CharField(max_length=100, default='')
 
+    captcha_verified = models.BooleanField(default=False)
+
     class Meta:
         db_table = 'fs_cdr'
         managed = True

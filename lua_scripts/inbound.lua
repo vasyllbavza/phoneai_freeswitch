@@ -156,6 +156,7 @@ if extension_id > 0 then
             if tonumber(captcha_response) ~= (param.number1 + param.number2) then
                 session:hangup();
             else
+                session:execute("set", "captcha_verified=1")
                 local phonebook_id = 0;
                 sql = "select phonebooks.id from phonebooks join fs_extension on phonebooks.extension_id=fs_extension.id"
                 sql = sql .. " where phonebooks.extension_id="..extension_id;

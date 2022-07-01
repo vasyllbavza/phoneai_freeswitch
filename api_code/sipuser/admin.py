@@ -83,6 +83,7 @@ class FsCDRAdmin(admin.ModelAdmin):
         'caller_carrier',
         'is_verified',
         'in_contact',
+        'captcha_verified',
         'call_from',
         'call_to',
         'didnumber',
