@@ -91,10 +91,10 @@ local sip_pai = session:getVariable("sip_h_P-Attestation-Indicator")
 freeswitch.consoleLog("ERR", inspect(sip_pai))
 
 -- session:execute("info")
-
+carrier_check = check_carrier(caller_id_number)
 callerid_verified = 0
 if check_stir_shaken_verified(sip_paid) == 1 then
-    if check_carrier(caller_id_number) == 1 then
+    if carrier_check == 1 then
         callerid_verified = 1
     end
 end
