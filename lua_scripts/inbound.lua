@@ -105,8 +105,10 @@ local extension_id = 0
 local sip_username = ""
 local sip_domain = ""
 local id_domain = 0
+local extension_cellphone = ""
 
-sql = "select fs_didnumber.phonenumber, fs_domain.id as id_domain, fs_domain.domain,fs_extension.sip_username, fs_didnumber.extension_id"
+sql = "select fs_didnumber.phonenumber, fs_domain.id as id_domain, fs_domain.domain,fs_extension.sip_username"
+sql = sql .. " , fs_didnumber.extension_id, fs_extension.cellphone"
 sql = sql .. " from fs_didnumber left join fs_extension on fs_extension.id=fs_didnumber.extension_id"
 sql = sql .. " join fs_users on fs_extension.user_id=fs_users.id "
 sql = sql .. " join fs_domain on fs_domain.id=fs_users.domain_id"
@@ -119,6 +121,7 @@ dbh:query(sql, function(row)
     sip_username = row["sip_username"]
     sip_domain = row["domain"]
     id_domain = row["id_domain"]
+    extension_cellphone = row["cellphone"]
 end)
 
 if extension_id > 0 then
@@ -198,11 +201,107 @@ if extension_id > 0 then
     session:execute("export","RECORD_STEREO=true");
     session:execute("export","RECORD_APPEND=true");
 
+    if extension_cellphone ~= nil then
+        if caller_id_number:sub(-10) == extension_cellphone:sub(-10) then
+            local bridge_number = ""
+            local bridge_id = 0
+            sql = "select id, didnumber, target_number from fs_bridge_call where right(didnumber,10)=right('"..destination_number.."', 10) "
+            sql = sql .. " and current_timestamp < expired_at "
+            sql = sql .. " and active=true "
+            sql = sql .. " order by created_at desc  limit 1"
+            dbh:query(sql, function(row)
+                bridge_id = row["id"]
+                bridge_number = row["target_number"]
+            end)
+            if bridge_number == "" then
+                -- Call B type
+                -- incoming call on your original number
+                session:answer();
+                session:execute("record_session", recording_file)
+                while(session:ready()) do
+                    session:sleep(500);
+                end
+                session:hangup();
+                return false;
+            else
+                -- Call C type
+                -- Outbound call
+                callerid_verified = 1
+                extension_cellphone = bridge_number
+                sql = "update fs_bridge_call set active=false where id="..bridge_id
+                local ret = dbh:query(sql)
+                freeswitch.consoleLog("debug", inspect(ret))
+            end
+        end
+    end
+
+    if force_captcha ~= nil or callerid_verified == 0 then
+        -- captcha IVR
+        caller_in_contact = 0
+        sql = "select phonebooks.name,contacts.phonenumber,fs_extension.sip_username  from contacts "
+        sql = sql .. " join phonebooks on contacts.phonebook_id=phonebooks.id"
+        sql = sql .. " join fs_extension on phonebooks.extension_id=fs_extension.id"
+        sql = sql .. " where right(contacts.phonenumber,10) = right('"..caller_id_number.."',10)"
+        dbh:query(sql, function(row)
+            caller_in_contact = 1
+        end)
+        session:execute("set", "caller_in_contact="..caller_in_contact)
+        session:execute("export", "caller_in_contact="..caller_in_contact)
+
+        if force_captcha ~= nil or caller_in_contact == 0 then
+
+            session:answer()
+            session:execute("sleep", "1000")
+            --set the callback function
+            if (session:ready()) then
+                session:setVariable("playback_terminators", "#")
+                session:setInputCallback("on_dtmf", "")
+            end
+
+            -- captcha ivr
+            dtmf_digits = '';
+            math.randomseed(os.time())
+            param = {}
+            param.number1 = math.random(1, 5)
+            param.number2 = math.random(1, 4)
+            captcha_response = macro(session, "captcha_ivr", 1, 5000, param)
+            freeswitch.consoleLog("INFO", captcha_response)
+            if captcha_response ~= nil and captcha_response ~= "" and tonumber(captcha_response) ~= nil then
+                if tonumber(captcha_response) ~= (param.number1 + param.number2) then
+                    session:hangup();
+                else
+                    local phonebook_id = 0;
+                    sql = "select phonebooks.id from phonebooks join fs_extension on phonebooks.extension_id=fs_extension.id"
+                    sql = sql .. " where phonebooks.extension_id="..extension_id;
+                    freeswitch.consoleLog("INFO", sql)
+                    dbh:query(sql, function(row)
+                        phonebook_id = tonumber(row['id'])
+                    end)
+                    sql = "insert into contacts(phonenumber,active,source, phonebook_id) "
+                    sql = sql .. " values('"..caller_id_number.."', '1', 'captcha',"..phonebook_id..")"
+                    freeswitch.consoleLog("INFO", sql)
+                    local result = dbh:query(sql)
+                    freeswitch.consoleLog("INFO", inspect(result))
+                end
+            else
+                session:hangup();
+            end
+
+        end
+    end
     session:execute("set","profile=s3")
     session:execute("set","RECORD_STEREO=true");
     session:execute("set","api_on_answer=uuid_record "..call_uuid.." start "..recording_file)
+
     -- origination_param = "{phoneai_direction=inbound,phoneai_source_number"..caller_id_number.."}"
-    session:execute("bridge", "user/"..sip_username.."@"..sip_domain)
+    -- session:execute("bridge", "user/"..sip_username.."@"..sip_domain)
+    if extension_cellphone ~= "" then
+        session:execute("set", "effective_caller_id_name=${outbound_caller_id_name}")
+        session:execute("set", "effective_caller_id_number=${outbound_caller_id_number}")
+        session:execute("set", "hangup_after_bridge=true")
+        session:execute("set", "ignore_display_updates=true")
+        session:execute("bridge", "sofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*"..extension_cellphone)
+    end
 
 end
 

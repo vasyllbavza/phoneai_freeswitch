@@ -8,6 +8,7 @@ from sipuser.models import (
     FsProvider,
     FsDidNumber,
     FsUser,
+    BridgeCall,
 )
 
 
@@ -38,7 +39,7 @@ admin.site.register(FsUser, FsUserAdmin)
 
 
 class ExtensionAdmin(admin.ModelAdmin):
-    list_display = ('user_name', 'sip_username', 'sip_password', 'created_at', 'updated_at')
+    list_display = ('user_name', 'sip_username', 'sip_password', 'cellphone', 'created_at', 'updated_at')
     list_filter = [
         "created_at",
     ]
@@ -101,3 +102,12 @@ class FsCDRAdmin(admin.ModelAdmin):
 
 
 admin.site.register(FsCDR, FsCDRAdmin)
+
+
+class BridgeCallAdmin(admin.ModelAdmin):
+    list_display = ('id', 'didnumber', 'target_number', 'active', 'timeout', 'expired_at', 'created_at')
+
+    search_fields = ['didnumber', 'target_number']
+
+
+admin.site.register(BridgeCall, BridgeCallAdmin)

@@ -54,6 +54,8 @@ class Extension(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
+    cellphone = models.CharField(verbose_name="Forwarding number", max_length=20, default="")
+
     class Meta:
         db_table = 'fs_extension'
         managed = True
@@ -169,3 +171,27 @@ class FsCDR(models.Model):
 
     recording_player.allow_tags = True
     recording_player.short_description = ('Recording')
+
+
+class BridgeCall(models.Model):
+
+    didnumber = models.CharField(verbose_name="OneUp Number", max_length=20)
+    target_number = models.CharField(verbose_name="Target Number", max_length=20)
+    active = models.BooleanField(default=True)
+    timeout = models.IntegerField(default=5)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    expired_at = models.DateTimeField(null=True)
+
+    class Meta:
+        db_table = 'fs_bridge_call'
+        managed = True
+        verbose_name = 'Bridge Call'
+        verbose_name_plural = 'Bridge Calls'
+
+    def __str__(self):
+        return "%s" % self.target_number
+
+    def save(self, *args, **kwargs):
+        from datetime import datetime, timedelta
+        self.expired_at = datetime.now() + timedelta(minutes=self.timeout)
+        super(BridgeCall, self).save(*args, **kwargs)

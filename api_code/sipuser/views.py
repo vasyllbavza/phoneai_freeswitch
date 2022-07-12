@@ -20,7 +20,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from .models import Domain, Extension, FsCDR, FsUser, FsProvider, FsDidNumber
+from .models import Domain, Extension, FsCDR, FsUser, FsProvider, FsDidNumber, BridgeCall
 from contacts.models import Phonebook
 
 from .serializers import (
@@ -32,6 +32,7 @@ from .serializers import (
     DidNUmberSerializer,
     DidNUmberCreateSerializer,
     DidNumberSearchSerializer,
+    BridgeCallSerializer,
 )
 logger = logging.getLogger(__name__)
 
@@ -262,3 +263,29 @@ class CdrViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return super().get_serializer_class()
+
+
+class BridgeCallViewSet(ModelViewSet):
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    queryset = BridgeCall.objects.none()
+    serializer_class = BridgeCallSerializer
+    search_fields = [
+    ]
+    # filterset_class = ExtensionFilter
+    ordering_fields = [
+        "id",
+    ]
+
+    # MARK: - Overrides
+
+    def get_queryset(self):
+        from datetime import datetime
+        return BridgeCall.objects.filter(active=True, expired_at__gte=datetime.now())
+
+    def perform_create(self, serializer):
+        print(self.request.user)
+        print(serializer.validated_data)
+        object = serializer.save()
+        print(object)

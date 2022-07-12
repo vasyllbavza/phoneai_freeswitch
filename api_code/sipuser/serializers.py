@@ -6,7 +6,7 @@ from rest_framework.serializers import (
 )
 from django.conf import settings
 
-from .models import Extension, FsDidNumber, FsUser, FsCDR
+from .models import Extension, FsDidNumber, FsUser, FsCDR, BridgeCall
 
 
 class ExtensionCreateSerializer(ModelSerializer):
@@ -16,7 +16,8 @@ class ExtensionCreateSerializer(ModelSerializer):
             "id",
             # "user_id",
             "sip_username",
-            "sip_password"
+            "sip_password",
+            "cellphone"
         ]
 
     # MARK: - Properties
@@ -49,6 +50,7 @@ class ExtensionSerializer(ModelSerializer):
         fields = [
             "id",
             "user_id",
+            "cellphone",
             "sip_username",
             "sip_password",
             "updated_at",
@@ -215,3 +217,16 @@ class CdrSerializer(ModelSerializer):
             pass
         # representation['category'] = CategorySerializer(instance.category).data
         return representation
+
+
+class BridgeCallSerializer(ModelSerializer):
+    class Meta:
+        model = BridgeCall
+        fields = [
+            "id",
+            "didnumber",
+            "target_number",
+            "timeout",
+            "active",
+            "expired_at"
+        ]
