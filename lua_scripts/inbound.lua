@@ -7,6 +7,7 @@
 require "app.phoneai.settings"
 require "app.phoneai.macro"
 
+local myjson = require "json";
 local inspect = require "inspect"
 local dbh = freeswitch.Dbh("pgsql://hostaddr=127.0.0.1 dbname=phoneai user=phoneai password='P0s@@w0123#' options='-c client_min_messages=NOTICE'")
 
@@ -34,6 +35,25 @@ function check_carrier(number)
         return 1
     end
     return 0
+end
+
+function check_number(number, stir_shaken_verified)
+    local check_url = "https://phoneai.boomslang.io/api/number/check/?number="..number:sub(-11)
+    check_url = check_url .. "&stir_shaken="..stir_shaken_verified
+    session:execute("curl", check_url)
+    curl_response_code = session:getVariable("curl_response_code")
+    curl_response      = session:getVariable("curl_response_data")
+    freeswitch.consoleLog("INFO", inspect(curl_response_code))
+    -- freeswitch.consoleLog("INFO", inspect(curl_response))
+    if curl_response ~= nil then
+        session:execute("set", "number_check="..curl_response)
+    end
+    if tonumber(curl_response_code) == 200 then
+        local cdata = myjson.decode(curl_response);
+        freeswitch.consoleLog("INFO", inspect(cdata))
+        return cdata
+    end
+    return nil
 end
 
 function check_stir_shaken_verified(inp_str)
@@ -90,14 +110,21 @@ freeswitch.consoleLog("ERR", inspect(sip_paid))
 local sip_pai = session:getVariable("sip_h_P-Attestation-Indicator")
 freeswitch.consoleLog("ERR", inspect(sip_pai))
 
--- session:execute("info")
-carrier_check = check_carrier(caller_id_number)
 callerid_verified = 0
-if check_stir_shaken_verified(sip_paid) == 1 then
-    if carrier_check == 1 then
+caller_in_contact = 0
+local stir_shaken_verified = check_stir_shaken_verified(sip_paid)
+
+-- session:execute("info")
+-- number check: carrier / spam check / others
+local check_response = check_number(caller_id_number, stir_shaken_verified)
+if check_response ~= nil then
+    -- process response data
+    if check_response['status'] == "success" then
         callerid_verified = 1
+        caller_in_contact = tonumber(check_response['caller_in_contact'])
     end
 end
+
 session:execute("set", "caller_is_verified="..callerid_verified)
 session:execute("export", "caller_is_verified="..callerid_verified)
 
@@ -126,14 +153,14 @@ end)
 
 if extension_id > 0 then
 
-    caller_in_contact = 0
-    sql = "select phonebooks.name,contacts.phonenumber,fs_extension.sip_username  from contacts "
-    sql = sql .. " join phonebooks on contacts.phonebook_id=phonebooks.id"
-    sql = sql .. " join fs_extension on phonebooks.extension_id=fs_extension.id"
-    sql = sql .. " where right(contacts.phonenumber,10) = right('"..caller_id_number.."',10)"
-    dbh:query(sql, function(row)
-        caller_in_contact = 1
-    end)
+    -- caller_in_contact = 0
+    -- sql = "select phonebooks.name,contacts.phonenumber,fs_extension.sip_username  from contacts "
+    -- sql = sql .. " join phonebooks on contacts.phonebook_id=phonebooks.id"
+    -- sql = sql .. " join fs_extension on phonebooks.extension_id=fs_extension.id"
+    -- sql = sql .. " where right(contacts.phonenumber,10) = right('"..caller_id_number.."',10)"
+    -- dbh:query(sql, function(row)
+    --     caller_in_contact = 1
+    -- end)
     session:execute("set", "caller_in_contact="..caller_in_contact)
     session:execute("export", "caller_in_contact="..caller_in_contact)
 
@@ -216,13 +243,22 @@ if extension_id > 0 then
             if bridge_number == "" then
                 -- Call B type
                 -- incoming call on your original number
+                extension_cellphone = ""
                 session:answer();
                 session:execute("record_session", recording_file)
-                while(session:ready()) do
-                    session:sleep(500);
+                local digits = session:getDigits(10, "#", 10000, 2000);
+                session:consoleLog("info", "Got dtmf: ".. digits .."\n");
+                if digits ~= nil and digits ~= "" and digits:len() == 10 then
+                    extension_cellphone = "1"..digits
+                    callerid_verified = 1
                 end
-                session:hangup();
-                return false;
+                if extension_cellphone == "" then
+                    while(session:ready()) do
+                        session:sleep(500);
+                    end
+                    session:hangup();
+                    return false;
+                end
             else
                 -- Call C type
                 -- Outbound call
@@ -294,13 +330,14 @@ if extension_id > 0 then
     session:execute("set","api_on_answer=uuid_record "..call_uuid.." start "..recording_file)
 
     -- origination_param = "{phoneai_direction=inbound,phoneai_source_number"..caller_id_number.."}"
-    -- session:execute("bridge", "user/"..sip_username.."@"..sip_domain)
     if extension_cellphone ~= "" then
         session:execute("set", "effective_caller_id_name=${outbound_caller_id_name}")
         session:execute("set", "effective_caller_id_number=${outbound_caller_id_number}")
         session:execute("set", "hangup_after_bridge=true")
         session:execute("set", "ignore_display_updates=true")
         session:execute("bridge", "sofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*"..extension_cellphone)
+    else
+        session:execute("bridge", "user/"..sip_username.."@"..sip_domain)
     end
 
 end

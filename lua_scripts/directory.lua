@@ -63,7 +63,7 @@ table.insert(xml, [[		<domain name="]] .. req_domain .. [[" alias="true">]]);
 
 dbh:query(sql, function(row)
 
-    freeswitch.consoleLog("INFO", inspect(row))
+    -- freeswitch.consoleLog("INFO", inspect(row))
     user_domain = row["domain"]
     user_domain_id = row["id_domain"]
     user_sipname = row["sip_username"]

@@ -1,0 +1,16 @@
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.pycodestyleArgs": [
+        "--ignore=E265,E266,E501,E722,W504",
+        "--exclude='.git,__pycache__'"
+    ],
+    "python.linting.pylintArgs": [
+        "--rcfile=.pylint.rc"
+    ],
+    "editor.rulers": [
+        100
+    ],
+    "python.pythonPath": "/Users/mohammadkamruzzaman/opt/anaconda3/envs/mangoENV27/bin/python"
+}

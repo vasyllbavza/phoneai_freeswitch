@@ -80,6 +80,7 @@ class FsCDRAdmin(admin.ModelAdmin):
         'domain',
         'call_uuid',
         'call_direction',
+        'bill_duration',
         'caller_type',
         'caller_carrier',
         'is_verified',

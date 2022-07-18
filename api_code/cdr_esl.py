@@ -138,8 +138,8 @@ def save_cdr_local(cdrdata):
     cdrlog.bill_duration = cdrdata["bill_duration"]
     cdrlog.call_direction = cdrdata["call_direction"]
     cdrlog.started_at = cdrdata["started_at"]
-    cdrlog.call_from = cdrdata["call_from"]
-    cdrlog.call_to = cdrdata["call_to"]
+    cdrlog.call_from = cdrdata["call_from"][-10:]
+    cdrlog.call_to = cdrdata["call_to"][-10:]
     try:
         cdrlog.extension = Extension.objects.get(pk=cdrdata["phoneai_extension_id"])
     except:

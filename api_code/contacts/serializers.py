@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from .models import Phonebook, Contacts
+from .models import Phonebook, Contacts, InboundNumbers
 
 
 class PhonebookCreateSerializer(ModelSerializer):
@@ -98,4 +98,22 @@ class ContactsUpdateSerializer(ModelSerializer):
             "phonebook",
             "phonenumber",
             "active",
+        ]
+
+
+class InboundNumbersSerializer(ModelSerializer):
+    class Meta:
+        model = InboundNumbers
+        fields = [
+            "id",
+            "phonenumber",
+            "caller_type",
+            "caller_carrier",
+            "carrier_expired",
+            "spam_risk",
+            "fraud_risk",
+            "unlawful_risk",
+            "spam_expired",
+            "created_at",
+            "updated_at",
         ]
