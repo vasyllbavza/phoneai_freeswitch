@@ -315,7 +315,7 @@ class NumberCheckView(APIView):
                 if cdr.captcha_verified:
                     require_catcha = 0
                     break
-                if cdr.bill_duration >= 2:
+                if cdr.bill_duration >= 120:
                     require_catcha = 0
                     break
 
