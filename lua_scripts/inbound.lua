@@ -125,8 +125,8 @@ if check_response ~= nil then
     end
 end
 
-session:execute("set", "caller_is_verified="..callerid_verified)
-session:execute("export", "caller_is_verified="..callerid_verified)
+session:execute("set", "caller_is_verified="..stir_shaken_verified)
+session:execute("export", "caller_is_verified="..stir_shaken_verified)
 
 local extension_id = 0
 local sip_username = ""
