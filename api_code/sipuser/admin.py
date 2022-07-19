@@ -99,7 +99,7 @@ class FsCDRAdmin(admin.ModelAdmin):
     #     "created_at",
     # ]
 
-    search_fields = ['call_uuid'', call_from', 'call_to']
+    search_fields = ['call_uuid', 'call_from', 'call_to']
 
 
 admin.site.register(FsCDR, FsCDRAdmin)
