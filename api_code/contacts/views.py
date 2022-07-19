@@ -311,7 +311,7 @@ class NumberCheckView(APIView):
             return Response(content, status=status.HTTP_200_OK)
 
         if require_catcha == 1:
-            cdrs = FsCDR.objects.filter(call_from=number)[:5]
+            cdrs = FsCDR.objects.filter(call_from=number).order_by('-created_at')[:5]
             for cdr in cdrs:
                 if cdr.captcha_verified:
                     require_catcha = 0
