@@ -407,6 +407,7 @@ Response:
         {
             "id":1,
             "user_id":1,
+            "cellphone": "",
             "sip_username":"1001",
             "sip_password":"123456",
             "domain":"phoneai.boomslang.io"
@@ -415,6 +416,7 @@ Response:
         {
             "id":2,
             "user_id":1,
+            "cellphone": "13014426594",
             "sip_username":"1002",
             "sip_password":"123456",
             "domain":"phoneai.boomslang.io"
@@ -434,6 +436,7 @@ Response:
     {
         "id":1,
         "user_id":1,
+        "cellphone": "",
         "sip_username":"1001",
         "sip_password":"123456",
         "domain":"phoneai.boomslang.io"
@@ -457,7 +460,8 @@ payload
 ```
 {
     "sip_username": "1003",
-    "sip_password": "123456"
+    "sip_password": "123456",
+    "cellphone": "",
 }
 ```
 
