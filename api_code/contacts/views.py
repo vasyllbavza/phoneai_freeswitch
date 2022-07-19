@@ -17,6 +17,7 @@ from django_filters.rest_framework import (
     FilterSet,
     CharFilter,
 )
+from django.db.models import Q
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -303,7 +304,7 @@ class NumberCheckView(APIView):
                 return Response(content, status=status.HTTP_404_NOT_FOUND)
 
         # user's phonebook
-        contact = Contacts.objects.filter(phonenumber=number).first()
+        contact = Contacts.objects.filter(phonenumber=number).filter(~Q(source="captcha")).first()
         if contact:
             content["status"] = "success"
             content["caller_in_contact"] = 1
