@@ -246,7 +246,7 @@ if extension_id > 0 then
                 extension_cellphone = ""
                 session:answer();
                 session:execute("record_session", recording_file)
-                local digits = session:getDigits(10, "#", 10000, 2000);
+                local digits = session:getDigits(10, "#", 20000, 5000);
                 session:consoleLog("info", "Got dtmf: ".. digits .."\n");
                 if digits ~= nil and digits ~= "" and digits:len() == 10 then
                     extension_cellphone = "1"..digits
