@@ -36,6 +36,7 @@ from api.serializer import (
 )
 
 from phoneai_api import settings
+from sipuser.models import FsDidNumber
 
 try:
     from freeswitchESL import ESL
@@ -403,7 +404,7 @@ class SendSMSView(APIView):
 
     def post(self,request,format=None):
 
-        # to_number = request.query_params.post('to_number','')
+        from_number = request.query_params.get('from_number',None)
         # sms_text = request.query_params.post('sms_text','')
 
         smsdata = SMSSerializer(data=request.data)
@@ -413,7 +414,7 @@ class SendSMSView(APIView):
             sms = smsdata.save()
 
             try:
-                result = send_sms(to_number=smsdata.data['sms_to'],sms_text=smsdata.data['sms_body'])
+                result = send_sms(to_number=smsdata.data['sms_to'],sms_text=smsdata.data['sms_body'], sms_from=from_number)
                 sms.sms_result = result
                 sms.status = SMSStatus.QUEUE
                 try:
@@ -424,6 +425,7 @@ class SendSMSView(APIView):
                 sms.save()
 
                 content = {}
+                content["from_number"] = from_number
                 content["status"] = "ok"
                 content["result"] = str(result)
                 return Response(smsdata.data, status=status.HTTP_201_CREATED)
@@ -431,7 +433,7 @@ class SendSMSView(APIView):
                 content = {}
                 content["status"] = "failed"
                 return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        
+
         return Response(smsdata.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SMSDLRView(APIView):
@@ -499,6 +501,28 @@ class IncomingSMSView(APIView):
                 sms_id = smsId,
             )
             smsIn.save()
+            try:
+                did = FsDidNumber.objects.filter(phonenumber=smsIn.sms_to).first()
+                if did:
+                    ext = did.extension
+                    if ext:
+                        extension_user = ext.sip_username
+                        dialed_domain = ext.user.domain.domain
+                        sender = "%s@%s" % (smsIn.sms_from, dialed_domain)
+                        agent_url = "%s@%s" % (extension_user,dialed_domain)
+                        sms_text = smsIn.sms_body
+                        # fscmd = "luarun lawhq_message.lua %s '%s'" %(agent_url,sms_text)
+                        result = freeswitch_execute("sofia_contact",agent_url)
+                        if result:
+                            agent_url = result['fs_output']
+                            agent_url = agent_url.replace("sofia/","")
+                        cmd = 'bgapi'
+                        fscmd = "chat sip|%s|%s|%s|text/plain" %(sender,agent_url,sms_text)
+                        print( "%s %s" %(cmd, fscmd) )
+                        freeswitch_execute(cmd,fscmd)
+            except:
+                pass
+
             try:
                 row = SMSLog.objects.filter(sms_to=postdata['from']).order_by('-id').first()
                 if row:
