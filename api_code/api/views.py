@@ -38,6 +38,18 @@ from api.serializer import (
 from phoneai_api import settings
 from sipuser.models import FsDidNumber
 
+import logging
+import sys
+logging.basicConfig(
+    filename='/var/log/phoneai_app.log',
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)-6s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
+logger = logging.getLogger()
+handler = logging.StreamHandler(sys.stdout)
+logger.addHandler(handler)
+
 try:
     from freeswitchESL import ESL
 except ImportError:
@@ -480,7 +492,11 @@ class SMSDLRView(APIView):
             content["status"] = "ok"
             return Response(content, status=status.HTTP_200_OK)
         except:
-            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.exception( "Exception occured" )
+            # return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            content = {}
+            content["status"] = "ok"
+            return Response(content, status=status.HTTP_200_OK)
 
 class IncomingSMSView(APIView):
 # {
@@ -521,6 +537,7 @@ class IncomingSMSView(APIView):
                         print( "%s %s" %(cmd, fscmd) )
                         freeswitch_execute(cmd,fscmd)
             except:
+                logger.exception( "Exception occured" )
                 pass
 
             try:
@@ -535,9 +552,11 @@ class IncomingSMSView(APIView):
                     if row.callback_url:
                         post_webhook(row.callback_url, data)
             except:
+                logger.exception( "Exception occured" )
                 pass
             content = {}
             content["status"] = "ok"
             return Response(content, status=status.HTTP_200_OK)
         except:
+            logger.exception( "Exception occured" )
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
