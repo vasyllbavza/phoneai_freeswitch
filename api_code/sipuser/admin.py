@@ -39,7 +39,7 @@ admin.site.register(FsUser, FsUserAdmin)
 
 
 class ExtensionAdmin(admin.ModelAdmin):
-    list_display = ('user_name', 'sip_username', 'sip_password', 'cellphone', 'created_at', 'updated_at')
+    list_display = ('user_name', 'sip_username', 'sip_password', 'cellphone', 'did_number', 'created_at', 'updated_at')
     list_filter = [
         "created_at",
     ]

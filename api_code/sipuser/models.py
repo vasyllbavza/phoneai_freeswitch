@@ -69,6 +69,12 @@ class Extension(models.Model):
     def user_name(self):
         return self.user.user.username
 
+    def did_number(self):
+        try:
+            return self.extension_didnumber.phonenumber
+        except:
+            return ""
+
 
 class FsProvider(models.Model):
 
@@ -95,7 +101,7 @@ class FsDidNumber(models.Model):
     phonenumber = models.CharField(verbose_name="DID Number", max_length=20, unique=True)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, null=TRUE)
 
-    extension = models.ForeignKey(Extension, on_delete=models.CASCADE, null=TRUE)
+    extension = models.ForeignKey(Extension, on_delete=models.CASCADE, null=TRUE, related_name="extension_didnumber")
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
