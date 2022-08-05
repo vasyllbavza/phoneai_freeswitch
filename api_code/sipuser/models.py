@@ -55,6 +55,7 @@ class Extension(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     cellphone = models.CharField(verbose_name="Forwarding number", max_length=20, default="")
+    transcription = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'fs_extension'
