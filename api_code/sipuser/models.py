@@ -71,7 +71,7 @@ class Extension(models.Model):
 
     def did_number(self):
         try:
-            return self.extension_didnumber.phonenumber
+            return self.extension_didnumber.first().phonenumber
         except:
             return ""
 
