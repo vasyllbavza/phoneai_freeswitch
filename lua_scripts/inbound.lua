@@ -160,6 +160,7 @@ function onInput(s, type, obj)
                 if xmlstr ~= nil then
                     speech = parse_watson_xmlstr(xmlstr);
                     if speech ~= "" then
+                        freeswitch.consoleLog("err", "\n" .. speech .. "\n");
                         local evtdata = {};
                         evtdata["action"] = "transcription_speech";
                         evtdata['call_uuid'] = call_uuid;

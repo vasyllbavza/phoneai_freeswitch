@@ -20,7 +20,7 @@ function parse_watson_xmlstr(speechStr)
     end
     speech = speech:lower();
 
-    if confidenceVal >= confidenceRef then
+    if confidenceVal ~= nil and confidenceVal >= confidenceRef then
         speechOut = speech;
         return speech
     else
