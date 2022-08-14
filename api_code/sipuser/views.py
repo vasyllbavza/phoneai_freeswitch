@@ -240,11 +240,17 @@ class CdrFilter(FilterSet):
         fields = []
 
     did_number = CharFilter(field_name="did_number", label="DID Number", method="filter_did_number",)
+    extension_number = CharFilter(field_name="extension_number", label="Extension Number", method="filter_extension_number",)
 
     # MARK: - Methods
     def filter_did_number(self, queryset, name, value):
         if name == "did_number" and value:
             return queryset.filter(didnumber__phonenumber=value)
+        return queryset
+
+    def filter_extension_number(self, queryset, name, value):
+        if name == "extension_number" and value:
+            return queryset.filter(extension__sip_username=value)
         return queryset
 
 
