@@ -12,6 +12,7 @@ import pickle
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.wsgi import get_wsgi_application
 from django.conf import settings
+from tasks import process_cdr_audio
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "phoneai_api.settings")
 application = get_wsgi_application()
@@ -170,6 +171,11 @@ def save_cdr_local(cdrdata):
 
     cdrlog.save()
     logger.info("Saving CDR.. DONE.")
+
+    cdr_data = {}
+    cdr_data["RecordingFile"] = "/var/lib/freeswitch/recordings/usermedia/%s" % cdrlog.recording_file
+    cdr_data["id"] = cdrlog.id
+    process_cdr_audio.delay(cdr_data)
 
 
 con = ESL.ESLconnection(settings.ESL_HOSTNAME, settings.ESL_PORT, settings.ESL_SECRET)
