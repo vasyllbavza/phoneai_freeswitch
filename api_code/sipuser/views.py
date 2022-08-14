@@ -245,6 +245,8 @@ class CdrFilter(FilterSet):
     # MARK: - Methods
     def filter_did_number(self, queryset, name, value):
         if name == "did_number" and value:
+            if len(value) == 10:
+                value = "1%s" % value
             return queryset.filter(didnumber__phonenumber=value)
         return queryset
 
