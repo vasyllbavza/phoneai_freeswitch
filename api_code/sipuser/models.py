@@ -75,6 +75,13 @@ class Extension(models.Model):
         except:
             return ""
 
+    def transcription_stat(self):
+        try:
+            if self.transcription:
+                return "True"
+        except:
+            return "False"
+
 
 class FsProvider(models.Model):
 
