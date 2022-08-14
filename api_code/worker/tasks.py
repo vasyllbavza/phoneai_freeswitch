@@ -164,8 +164,8 @@ class GenericRecognizeCallback(RecognizeCallback):
 
         log(json.dumps(self.transcribed_data))
 
-        if self.cb:
-            self.cb(self.transcribed_data)
+        # if self.cb:
+        #     self.cb(self.transcribed_data)
 
         cdr = FsCDR.objects.get(pk=self.rc_data.id)
         cdr.transcription_text = self.transcribed_data
