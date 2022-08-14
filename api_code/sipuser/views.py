@@ -15,11 +15,13 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import (
     FilterSet,
     CharFilter,
+    DjangoFilterBackend,
 )
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter, OrderingFilter
 from .models import Domain, Extension, FsCDR, FsUser, FsProvider, FsDidNumber, BridgeCall
 from contacts.models import Phonebook
 
@@ -241,7 +243,7 @@ class CdrFilter(FilterSet):
 
     # MARK: - Methods
     def filter_did_number(self, queryset, name, value):
-        if value:
+        if name == "did_number" and value:
             return queryset.filter(didnumber__phonenumber=value)
         return queryset
 
@@ -252,12 +254,11 @@ class CdrViewSet(ModelViewSet):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     queryset = FsCDR.objects.none()
     serializer_class = CdrSerializer
-    search_fields = [
-    ]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['call_from', 'call_to']
     filterset_class = CdrFilter
-    ordering_fields = [
-        "id",
-    ]
+    ordering_fields = ['id', 'created_at']
+    ordering = ['created_at']
 
     # MARK: - Overrides
 
