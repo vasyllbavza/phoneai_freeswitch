@@ -251,7 +251,7 @@ def process_cdr_audio(cdr_data):
             result = speech_to_text.recognize_using_websocket(
                 audio=audio_source,
                 recognize_callback=myRecognizeCallback,
-                content_type='audio/wav',
+                content_type='audio/mp3',
                 model='en-US_BroadbandModel',
                 timestamps=True,
                 smart_formatting=True,
