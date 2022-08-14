@@ -11,13 +11,6 @@ import datetime
 from word2number import w2n
 
 import settings
-
-app = Celery('tasks', backend=None)
-app.conf.broker_url = settings.REDIS_BROKER
-
-logging.basicConfig(filename='/var/log/transcribe.log', level=logging.INFO)
-logger = logging.getLogger()
-
 from api.models import (
     PhoneNumber,
     CallLog,
@@ -25,6 +18,13 @@ from api.models import (
     CallKey,
     CallStatus
 )
+
+app = Celery('tasks', backend=None)
+app.conf.broker_url = settings.REDIS_BROKER
+
+logging.basicConfig(filename='/var/log/transcribe.log', level=logging.INFO)
+logger = logging.getLogger()
+
 
 @app.task
 def add(x, y):
@@ -35,13 +35,15 @@ def log(msg, level="INFO"):
 
     dt = "%sZ" % datetime.datetime.utcnow().replace(microsecond=0).isoformat()
     print("%s voicemail: %s : %s" % (dt, level, msg))
-    logger.info("%s :: %s"%(dt,msg))
+    logger.info("%s :: %s" % (dt, msg))
 
-def isNumber(str):    
+
+def isNumber(str):
     try:
         return w2n.word_to_num(str)
     except:
         return False
+
 
 def findKeys(audio_text):
     from urllib.parse import unquote
@@ -49,6 +51,7 @@ def findKeys(audio_text):
     audio_text = audio_text.strip()
     ret = [isNumber(s) for s in audio_text.split() if isNumber(s)]
     return ret
+
 
 class MyRecognizeCallback(RecognizeCallback):
     def __init__(self):
@@ -70,7 +73,7 @@ class MyRecognizeCallback(RecognizeCallback):
                     if len(keys) > 1:
                         # print(parts['timestamps'])
                         speech = ''
-                        speech_stop  = 0
+                        speech_stop = 0
                         for part in parts['timestamps']:
                             # print(part)
                             if speech_stop == 0:
@@ -88,7 +91,7 @@ class MyRecognizeCallback(RecognizeCallback):
                                     speech = ''
                                     speech_stop = 0
                                 else:
-                                    speech = "%s %s" %(speech,part[0])
+                                    speech = "%s %s" % (speech, part[0])
                                     speech_stop = part[2]
                         print(speech)
                         if len(speech) > 0:
@@ -157,8 +160,7 @@ def process_menu_audio(vm_data):
         myRecognizeCallback = MyRecognizeCallback()
         myRecognizeCallback.set_data(vm_data)
 
-        with open(vm_file,
-                    'rb') as audio_file:
+        with open(vm_file, 'rb') as audio_file:
             audio_source = AudioSource(audio_file)
             result = speech_to_text.recognize_using_websocket(
                 audio=audio_source,
