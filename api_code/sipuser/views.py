@@ -232,6 +232,20 @@ class DidNumberViewSet(ModelViewSet):
         return Response({"data": number_list})
 
 
+class CdrFilter(FilterSet):
+    class Meta:
+        model = FsCDR
+        fields = []
+
+    did_number = CharFilter(field_name="did_number", label="DID Number", method="filter_did_number",)
+
+    # MARK: - Methods
+    def filter_did_number(self, queryset, name, value):
+        if value:
+            return queryset.filter(didnumber__phonenumber=value)
+        return queryset
+
+
 class CdrViewSet(ModelViewSet):
 
     permission_classes = [IsAuthenticated]
@@ -240,7 +254,7 @@ class CdrViewSet(ModelViewSet):
     serializer_class = CdrSerializer
     search_fields = [
     ]
-    # filterset_class = ExtensionFilter
+    filterset_class = CdrFilter
     ordering_fields = [
         "id",
     ]
