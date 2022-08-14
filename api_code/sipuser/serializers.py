@@ -17,7 +17,7 @@ class ExtensionCreateSerializer(ModelSerializer):
             # "user_id",
             "sip_username",
             "sip_password",
-            "cellphone"
+            "cellphone",
         ]
 
     # MARK: - Properties
@@ -51,6 +51,7 @@ class ExtensionSerializer(ModelSerializer):
             "id",
             "user_id",
             "cellphone",
+            "transcription",
             "sip_username",
             "sip_password",
             "updated_at",
