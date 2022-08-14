@@ -143,7 +143,7 @@ class MyRecognizeCallback(RecognizeCallback):
 
 class GenericRecognizeCallback(RecognizeCallback):
     def __init__(self):
-        GenericRecognizeCallback.__init__(self)
+        RecognizeCallback.__init__(self)
 
     def set_data(self, rc_data):
         self.rc_data = rc_data
