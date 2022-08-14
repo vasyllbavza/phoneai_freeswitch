@@ -23,6 +23,7 @@ local last_matching_digits = session:getVariable("last_matching_digits")
 freeswitch.consoleLog("INFO",inspect(call_transcription))
 if call_transcription == nil then
     freeswitch.consoleLog("ERR", "transcription started")
+    session:setVariable("transcribed", "1")
     session:setVariable("call_transcription", "1")
     session:setInputCallback("onInput", "")
     session:execute("detect_speech", "unimrcp:watson {start-input-timers=false,smart_formatting=true,timestamps=true}builtin:speech/transcribe undefined");

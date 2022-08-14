@@ -294,6 +294,7 @@ if extension_id > 0 then
                 session:execute("record_session", recording_file)
                 session:execute("bind_digit_action", "my_digits,3,exec:lua,app/phoneai/xfer_ext.lua ${uuid} "..extension_id.." "..sip_username)
                 if transcription == 1 then
+                    session:setVariable("transcribed", "1")
                     session:setVariable("call_transcription", "1")
                     freeswitch.consoleLog("ERR", "transcription started")
                     session:setInputCallback("onInput", "")
