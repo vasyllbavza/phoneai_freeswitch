@@ -14,19 +14,13 @@ class ExtensionCreateSerializer(ModelSerializer):
         model = Extension
         fields = [
             "id",
-            # "user_id",
             "sip_username",
             "sip_password",
             "cellphone",
+            "transcription",
         ]
 
     # MARK: - Properties
-
-    # user_id = IntegerField(
-    #     label="FS USER ID",
-    #     min_value=1,
-    #     max_value=2147483647,
-    # )
 
     def create(self, validated_data):
         print(validated_data)
@@ -37,11 +31,6 @@ class ExtensionCreateSerializer(ModelSerializer):
         representation['domain'] = instance.user.domain.domain
 
         return representation
-
-# class VoicemailMarkAsReadSerializer(ModelSerializer):
-#     class Meta:
-#         model = Voicemail
-#         fields = []
 
 
 class ExtensionSerializer(ModelSerializer):
@@ -60,21 +49,7 @@ class ExtensionSerializer(ModelSerializer):
 
     # MARK: - Properties
 
-    # user = SerializerMethodField()
-
     # MARK: - Methods
-
-    # def get_user(self, obj):
-    #     if obj.user_id:
-    #         try:
-    #             fsuser = FsUser.objects.get(pk=obj.user_id)
-    #             return {
-    #                 "id": fsuser.id,
-    #                 "username": fsuser.user.username or "",
-    #             }
-    #         except FsUser.DoesNotExist:
-    #             pass
-    #     return None
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -89,6 +64,8 @@ class ExtensionRetrieveSerializer(ModelSerializer):
         fields = [
             "id",
             "user",
+            "cellphone",
+            "transcription",
             "sip_username",
             "sip_password",
             "created_at",
@@ -120,6 +97,8 @@ class ExtensionUpdateSerializer(ModelSerializer):
         fields = [
             "sip_username",
             "sip_password",
+            "cellphone",
+            "transcription",
         ]
 
 
