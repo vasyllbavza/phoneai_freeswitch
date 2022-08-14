@@ -292,6 +292,19 @@ if extension_id > 0 then
                 extension_cellphone = ""
                 session:answer();
                 session:execute("record_session", recording_file)
+                session:execute("bind_digit_action", "my_digits,3,exec:lua,app/phoneai/xfer_ext.lua ${uuid} "..extension_id.." "..sip_username)
+                if transcription == 1 then
+                    session:setVariable("call_transcription", "1")
+                    freeswitch.consoleLog("ERR", "transcription started")
+                    session:setInputCallback("onInput", "")
+                    session:execute("detect_speech", "unimrcp:watson {start-input-timers=false,smart_formatting=true,timestamps=true}builtin:speech/transcribe undefined");
+                    local evtdata = {};
+                    evtdata["action"] = "transcription_start";
+                    evtdata['call_uuid'] = call_uuid;
+                    evtdata['extension_id'] = extension_id;
+                    evtdata['sip_username'] = sip_username;
+                    mydtbd_send_event(evtdata);
+                end
                 local digits = session:getDigits(10, "#", 20000, 5000);
                 session:consoleLog("info", "Got dtmf: ".. digits .."\n");
                 if digits ~= nil and digits ~= "" and digits:len() == 10 then
@@ -299,16 +312,6 @@ if extension_id > 0 then
                     callerid_verified = 1
                 end
                 if extension_cellphone == "" then
-                    if transcription == 1 then
-                        session:setInputCallback("onInput", "")
-                        session:execute("detect_speech", "unimrcp:watson {start-input-timers=false}builtin:speech/transcribe undefined");
-                        local evtdata = {};
-                        evtdata["action"] = "transcription_start";
-                        evtdata['call_uuid'] = call_uuid;
-                        evtdata['extension_id'] = extension_id;
-                        evtdata['sip_username'] = sip_username;
-                        mydtbd_send_event(evtdata);
-                    end
                     while(session:ready()) do
                         session:sleep(500);
                     end
