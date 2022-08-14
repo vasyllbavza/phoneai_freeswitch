@@ -266,7 +266,7 @@ class CdrViewSet(ModelViewSet):
     search_fields = ['call_from', 'call_to']
     filterset_class = CdrFilter
     ordering_fields = ['id', 'created_at']
-    ordering = ['created_at']
+    ordering = ['-created_at']
 
     # MARK: - Overrides
 
