@@ -200,6 +200,7 @@ class CdrSerializer(ModelSerializer):
             "in_contact",
             "bill_duration",
             "recording",
+            "transcription_text",
             "hangup_cause",
             "started_at",
             "created_at",
