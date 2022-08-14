@@ -160,6 +160,8 @@ class FsCDR(models.Model):
 
     captcha_verified = models.BooleanField(default=False)
 
+    transcription_text = models.TextField(null=True)
+
     class Meta:
         db_table = 'fs_cdr'
         managed = True
