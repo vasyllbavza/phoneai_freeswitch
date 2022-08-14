@@ -6,8 +6,10 @@
 --
 require "app.phoneai.settings"
 require "app.phoneai.macro"
+require "app.phoneai.lib_events"
+require "app.phoneai.utils"
 
-local myjson = require "json";
+local myjson = require "json"
 local inspect = require "inspect"
 local dbh = freeswitch.Dbh("pgsql://hostaddr=127.0.0.1 dbname=phoneai user=phoneai password='P0s@@w0123#' options='-c client_min_messages=NOTICE'")
 
@@ -133,9 +135,49 @@ local sip_username = ""
 local sip_domain = ""
 local id_domain = 0
 local extension_cellphone = ""
+local transcription = 0
+
+-- This is the input callback used by dtmf or any other events
+-- on this session such as ASR.
+-- we are using detect_speech to capture watson transcription data
+-- and this information pass to use through this callback
+--
+function onInput(s, type, obj)
+    freeswitch.consoleLog("info", "Callback with type " .. type .. "\n");
+    if (type == "dtmf") then
+        freeswitch.consoleLog("info", "DTMF Digit: " .. obj.digit .. "\n");
+    else if (type == "event") then
+        local event = obj:getHeader("Speech-Type");
+        if (event == "begin-speaking") then
+            freeswitch.consoleLog("info", "\n" .. obj:serialize() .. "\n");
+        end
+        if (event == "detected-speech") then
+            freeswitch.consoleLog("debug", "\n" .. obj:serialize() .. "\n");
+            if (obj:getBody()) then
+                session:execute("detect_speech", "resume");
+                -- Parse the results from the event into the results table for later use.
+                local xmlstr = obj:getBody();
+                if xmlstr ~= nil then
+                    speech = parse_watson_xmlstr(xmlstr);
+                    if speech ~= "" then
+                        freeswitch.consoleLog("err", "\n" .. speech .. "\n");
+                        local evtdata = {};
+                        evtdata["action"] = "transcription_speech";
+                        evtdata['call_uuid'] = call_uuid;
+                        evtdata['extension_id'] = extension_id;
+                        evtdata['sip_username'] = sip_username;
+                        evtdata['speech'] = speech;
+                        mydtbd_send_event(evtdata);
+                    end
+                end
+            end
+        end
+    end
+    end
+end
 
 sql = "select fs_didnumber.phonenumber, fs_domain.id as id_domain, fs_domain.domain,fs_extension.sip_username"
-sql = sql .. " , fs_didnumber.extension_id, fs_extension.cellphone"
+sql = sql .. " , fs_didnumber.extension_id, fs_extension.cellphone, fs_extension.transcription "
 sql = sql .. " from fs_didnumber left join fs_extension on fs_extension.id=fs_didnumber.extension_id"
 sql = sql .. " join fs_users on fs_extension.user_id=fs_users.id "
 sql = sql .. " join fs_domain on fs_domain.id=fs_users.domain_id"
@@ -149,6 +191,10 @@ dbh:query(sql, function(row)
     sip_domain = row["domain"]
     id_domain = row["id_domain"]
     extension_cellphone = row["cellphone"]
+    transcription = row["transcription"]
+    if transcription ~= nil and transcription ~= "" and tonumber(transcription) ~= nil then
+        transcription = tonumber(transcription)
+    end
 end)
 
 if extension_id > 0 then
@@ -246,6 +292,20 @@ if extension_id > 0 then
                 extension_cellphone = ""
                 session:answer();
                 session:execute("record_session", recording_file)
+                session:execute("bind_digit_action", "my_digits,3,exec:lua,app/phoneai/xfer_ext.lua ${uuid} "..extension_id.." "..sip_username)
+                if transcription == 1 then
+                    session:setVariable("transcribed", "1")
+                    session:setVariable("call_transcription", "1")
+                    freeswitch.consoleLog("ERR", "transcription started")
+                    session:setInputCallback("onInput", "")
+                    session:execute("detect_speech", "unimrcp:watson {start-input-timers=false,smart_formatting=true,timestamps=true}builtin:speech/transcribe undefined");
+                    local evtdata = {};
+                    evtdata["action"] = "transcription_start";
+                    evtdata['call_uuid'] = call_uuid;
+                    evtdata['extension_id'] = extension_id;
+                    evtdata['sip_username'] = sip_username;
+                    mydtbd_send_event(evtdata);
+                end
                 local digits = session:getDigits(10, "#", 20000, 5000);
                 session:consoleLog("info", "Got dtmf: ".. digits .."\n");
                 if digits ~= nil and digits ~= "" and digits:len() == 10 then

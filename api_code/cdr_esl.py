@@ -12,6 +12,7 @@ import pickle
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.wsgi import get_wsgi_application
 from django.conf import settings
+from tasks import process_cdr_audio
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "phoneai_api.settings")
 application = get_wsgi_application()
@@ -170,6 +171,14 @@ def save_cdr_local(cdrdata):
 
     cdrlog.save()
     logger.info("Saving CDR.. DONE.")
+    try:
+        if cdrdata["transcribed"]:
+            cdr_data = {}
+            cdr_data["RecordingFile"] = "/var/lib/freeswitch/recordings/usermedia/%s" % cdrlog.recording_file
+            cdr_data["id"] = cdrlog.id
+            process_cdr_audio.delay(cdr_data)
+    except:
+        pass
 
 
 con = ESL.ESLconnection(settings.ESL_HOSTNAME, settings.ESL_PORT, settings.ESL_SECRET)
@@ -329,6 +338,7 @@ try:
                     except:
                         pass
                     cdr['captcha_verified'] = get_event_variable(e, "captcha_verified", "int")
+                    cdr['transcribed'] = get_event_variable(e, "transcribed", "int")
                     try:
                         if cdr['leg'] == 'A':
                             print(cdr)

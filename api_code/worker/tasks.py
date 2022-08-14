@@ -11,13 +11,6 @@ import datetime
 from word2number import w2n
 
 import settings
-
-app = Celery('tasks', backend=None)
-app.conf.broker_url = settings.REDIS_BROKER
-
-logging.basicConfig(filename='/var/log/transcribe.log', level=logging.INFO)
-logger = logging.getLogger()
-
 from api.models import (
     PhoneNumber,
     CallLog,
@@ -25,6 +18,14 @@ from api.models import (
     CallKey,
     CallStatus
 )
+from sipuser.models import FsCDR
+
+app = Celery('tasks', backend=None)
+app.conf.broker_url = settings.REDIS_BROKER
+
+logging.basicConfig(filename='/var/log/transcribe.log', level=logging.INFO)
+logger = logging.getLogger()
+
 
 @app.task
 def add(x, y):
@@ -35,13 +36,15 @@ def log(msg, level="INFO"):
 
     dt = "%sZ" % datetime.datetime.utcnow().replace(microsecond=0).isoformat()
     print("%s voicemail: %s : %s" % (dt, level, msg))
-    logger.info("%s :: %s"%(dt,msg))
+    logger.info("%s :: %s" % (dt, msg))
 
-def isNumber(str):    
+
+def isNumber(str):
     try:
         return w2n.word_to_num(str)
     except:
         return False
+
 
 def findKeys(audio_text):
     from urllib.parse import unquote
@@ -49,6 +52,7 @@ def findKeys(audio_text):
     audio_text = audio_text.strip()
     ret = [isNumber(s) for s in audio_text.split() if isNumber(s)]
     return ret
+
 
 class MyRecognizeCallback(RecognizeCallback):
     def __init__(self):
@@ -70,7 +74,7 @@ class MyRecognizeCallback(RecognizeCallback):
                     if len(keys) > 1:
                         # print(parts['timestamps'])
                         speech = ''
-                        speech_stop  = 0
+                        speech_stop = 0
                         for part in parts['timestamps']:
                             # print(part)
                             if speech_stop == 0:
@@ -88,7 +92,7 @@ class MyRecognizeCallback(RecognizeCallback):
                                     speech = ''
                                     speech_stop = 0
                                 else:
-                                    speech = "%s %s" %(speech,part[0])
+                                    speech = "%s %s" % (speech, part[0])
                                     speech_stop = part[2]
                         print(speech)
                         if len(speech) > 0:
@@ -137,6 +141,56 @@ class MyRecognizeCallback(RecognizeCallback):
         log(hypothesis)
 
 
+class GenericRecognizeCallback(RecognizeCallback):
+    def __init__(self):
+        RecognizeCallback.__init__(self)
+
+    def set_data(self, rc_data):
+        self.rc_data = rc_data
+        self.transcribed_data = []
+
+    def set_cb(self, cb_name):
+        self.cb = cb_name
+
+    def on_data(self, data):
+
+        log(json.dumps(data))
+        for result in data["results"]:
+            if result['final']:
+                # print(result['alternatives'])
+                for parts in result['alternatives']:
+                    # print(parts)
+                    self.transcribed_data.append(parts)
+
+        log(json.dumps(self.transcribed_data))
+
+        # if self.cb:
+        #     self.cb(self.transcribed_data)
+
+        cdr = FsCDR.objects.get(pk=self.rc_data["id"])
+        cdr.transcription_text = self.transcribed_data
+        cdr.save()
+
+    def on_error(self, error):
+        log('Error received: {}'.format(error))
+
+    def on_inactivity_timeout(self, error):
+        log('Inactivity timeout: {}'.format(error))
+
+    def on_transcription(self, transcript):
+        log("transcript:")
+        log(transcript)
+
+    def on_connected(self):
+        log('Connection was successful')
+
+    def on_listening(self):
+        log('Service is listening')
+
+    def on_hypothesis(self, hypothesis):
+        log(hypothesis)
+
+
 @ app.task
 def process_menu_audio(vm_data):
 
@@ -157,13 +211,47 @@ def process_menu_audio(vm_data):
         myRecognizeCallback = MyRecognizeCallback()
         myRecognizeCallback.set_data(vm_data)
 
-        with open(vm_file,
-                    'rb') as audio_file:
+        with open(vm_file, 'rb') as audio_file:
             audio_source = AudioSource(audio_file)
             result = speech_to_text.recognize_using_websocket(
                 audio=audio_source,
                 recognize_callback=myRecognizeCallback,
                 content_type='audio/wav',
+                model='en-US_BroadbandModel',
+                timestamps=True,
+                smart_formatting=True,
+                max_alternatives=1)
+            log("finished transcription")
+    except ApiException as ex:
+        log("Method failed with status code % s: % s" %
+            (str(ex.code), ex.message))
+
+
+@ app.task
+def process_cdr_audio(cdr_data):
+
+    record_file = cdr_data["RecordingFile"]
+    log(cdr_data)
+
+    try:
+        authenticator = IAMAuthenticator(settings.ibm_apikey)
+        speech_to_text = SpeechToTextV1(
+            authenticator=authenticator
+        )
+
+        url = "%s/v1/recognize?model=en-US_NarrowbandModel&smart_formatting=true&timestamps=true" % settings.ibm_url
+        speech_to_text.set_service_url(url)
+        # speech_to_text.set_disable_ssl_verification(True)
+
+        myRecognizeCallback = GenericRecognizeCallback()
+        myRecognizeCallback.set_data(cdr_data)
+
+        with open(record_file, 'rb') as audio_file:
+            audio_source = AudioSource(audio_file)
+            result = speech_to_text.recognize_using_websocket(
+                audio=audio_source,
+                recognize_callback=myRecognizeCallback,
+                content_type='audio/mp3',
                 model='en-US_BroadbandModel',
                 timestamps=True,
                 smart_formatting=True,

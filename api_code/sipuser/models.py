@@ -55,6 +55,7 @@ class Extension(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     cellphone = models.CharField(verbose_name="Forwarding number", max_length=20, default="")
+    transcription = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'fs_extension'
@@ -67,6 +68,19 @@ class Extension(models.Model):
 
     def user_name(self):
         return self.user.user.username
+
+    def did_number(self):
+        try:
+            return self.extension_didnumber.first().phonenumber
+        except:
+            return ""
+
+    def transcription_stat(self):
+        try:
+            if self.transcription:
+                return "True"
+        except:
+            return "False"
 
 
 class FsProvider(models.Model):
@@ -94,7 +108,7 @@ class FsDidNumber(models.Model):
     phonenumber = models.CharField(verbose_name="DID Number", max_length=20, unique=True)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, null=TRUE)
 
-    extension = models.ForeignKey(Extension, on_delete=models.CASCADE, null=TRUE)
+    extension = models.ForeignKey(Extension, on_delete=models.CASCADE, null=TRUE, related_name="extension_didnumber")
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
@@ -145,6 +159,8 @@ class FsCDR(models.Model):
     caller_carrier = models.CharField(max_length=100, default='')
 
     captcha_verified = models.BooleanField(default=False)
+
+    transcription_text = models.TextField(null=True)
 
     class Meta:
         db_table = 'fs_cdr'
