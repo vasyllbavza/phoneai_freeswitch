@@ -211,3 +211,24 @@ class BridgeCall(models.Model):
         from datetime import datetime, timedelta
         self.expired_at = datetime.now() + timedelta(minutes=self.timeout)
         super(BridgeCall, self).save(*args, **kwargs)
+
+
+class ConferenceCenter(models.Model):
+    didnumber = models.ForeignKey(
+        FsDidNumber,
+        on_delete=models.CASCADE,
+        related_name="conference_didnumber"
+    )
+    pin = models.CharField(max_length=10, verbose_name="Conference PIN")
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    class Meta:
+        db_table = 'conference_room'
+        managed = True
+        verbose_name = 'Conference Room'
+        verbose_name_plural = 'Conference Room'
+
+    def __str__(self):
+        return "%s" % self.didnumber.phonenumber
