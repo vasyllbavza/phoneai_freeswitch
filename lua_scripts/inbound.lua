@@ -285,6 +285,12 @@ if extension_id > 0 then
 
     if extension_cellphone ~= nil then
         if caller_id_number:sub(-10) == extension_cellphone:sub(-10) then
+
+            if conference_id > 0 then --conference call
+                session:execute("conference", "conf_"..conference_id.."@default")
+                session:hangup();
+            end
+
             local bridge_number = ""
             local bridge_id = 0
             sql = "select id, didnumber, target_number from fs_bridge_call where right(didnumber,10)=right('"..destination_number.."', 10) "
