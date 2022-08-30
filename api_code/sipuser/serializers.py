@@ -220,3 +220,11 @@ class ConferenceCreateSerializer(ModelSerializer):
             "didnumber",
             "pin",
         ]
+
+class ConferenceSerializer(ModelSerializer):
+    class Meta:
+        model = ConferenceCenter
+        fields = [
+            "didnumber",
+            "pin",
+        ]
