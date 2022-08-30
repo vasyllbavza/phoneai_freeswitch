@@ -6,7 +6,7 @@ from rest_framework.serializers import (
 )
 from django.conf import settings
 
-from .models import Extension, FsDidNumber, FsUser, FsCDR, BridgeCall
+from .models import Extension, FsDidNumber, FsUser, FsCDR, BridgeCall, ConferenceCenter
 
 
 class ExtensionCreateSerializer(ModelSerializer):
@@ -210,4 +210,13 @@ class BridgeCallSerializer(ModelSerializer):
             "timeout",
             "active",
             "expired_at"
+        ]
+
+
+class ConferenceCreateSerializer(ModelSerializer):
+    class Meta:
+        model = ConferenceCenter
+        fields = [
+            "didnumber",
+            "pin",
         ]

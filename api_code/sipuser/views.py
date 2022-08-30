@@ -21,8 +21,9 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .models import Domain, Extension, FsCDR, FsUser, FsProvider, FsDidNumber, BridgeCall
+from .models import Domain, Extension, FsCDR, FsUser, FsProvider, FsDidNumber, BridgeCall, ConferenceCenter
 from contacts.models import Phonebook
 
 from .serializers import (
@@ -35,6 +36,7 @@ from .serializers import (
     DidNUmberCreateSerializer,
     DidNumberSearchSerializer,
     BridgeCallSerializer,
+    ConferenceSerializer,
 )
 logger = logging.getLogger(__name__)
 
@@ -306,6 +308,56 @@ class BridgeCallViewSet(ModelViewSet):
     def get_queryset(self):
         from datetime import datetime
         return BridgeCall.objects.filter(active=True, expired_at__gte=datetime.now())
+
+    def perform_create(self, serializer):
+        print(self.request.user)
+        print(serializer.validated_data)
+        object = serializer.save()
+        print(object)
+
+
+class ConferenceView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+
+    def post(self, request, format=None):
+
+        content = {}
+
+        didnumber = request.query_params.get('didnumber', '')
+        pin = request.query_params.get('pin', '')
+        try:
+            did = FsDidNumber.objects.get(phonenumber=didnumber)
+            conf = ConferenceCenter
+        except:
+            pass
+        number, isnew = PhoneNumber.objects.get_or_create(number=dial_number)
+        if business_name:
+            number.business_name = business_name
+        number.save()
+
+        serializer = PhonenumberSerializer(number)
+        return Response(serializer.data)
+
+
+class ConferenceViewSet(ModelViewSet):
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    queryset = ConferenceCenter.objects.none()
+    serializer_class = ConferenceSerializer
+    search_fields = [
+    ]
+    # filterset_class = ExtensionFilter
+    ordering_fields = [
+        "id",
+    ]
+
+    # MARK: - Overrides
+
+    def get_queryset(self):
+        return ConferenceCenter.objects.all()
 
     def perform_create(self, serializer):
         print(self.request.user)
