@@ -136,7 +136,8 @@ local sip_domain = ""
 local id_domain = 0
 local extension_cellphone = ""
 local transcription = 0
-
+local conference_id = 0
+local conference_pin = ""
 -- This is the input callback used by dtmf or any other events
 -- on this session such as ASR.
 -- we are using detect_speech to capture watson transcription data
@@ -178,9 +179,11 @@ end
 
 sql = "select fs_didnumber.phonenumber, fs_domain.id as id_domain, fs_domain.domain,fs_extension.sip_username"
 sql = sql .. " , fs_didnumber.extension_id, fs_extension.cellphone, fs_extension.transcription "
+sql = sql .. " , conference_room.pin as conference_pin, conference_room.id as conference_id "
 sql = sql .. " from fs_didnumber left join fs_extension on fs_extension.id=fs_didnumber.extension_id"
 sql = sql .. " join fs_users on fs_extension.user_id=fs_users.id "
 sql = sql .. " join fs_domain on fs_domain.id=fs_users.domain_id"
+sql = sql .. " left join conference_room on (conference_room.didnumber_id=fs_didnumber.id and conference_room.active=true)"
 sql = sql .. " where right(fs_didnumber.phonenumber,10) = right('"..destination_number.."',10)"
 
 freeswitch.consoleLog("INFO", sql)
@@ -194,6 +197,12 @@ dbh:query(sql, function(row)
     transcription = row["transcription"]
     if transcription ~= nil and transcription ~= "" and tonumber(transcription) ~= nil then
         transcription = tonumber(transcription)
+    end
+    if row["conference_pin"] ~= nil and row["conference_pin"] ~= "" then
+        conference_pin = row["conference_pin"]
+    end
+    if row["conference_id"] ~= nil and tonumber(row["conference_id"]) ~= nil then
+        conference_id = tonumber(row["conference_id"])
     end
 end)
 
@@ -276,6 +285,12 @@ if extension_id > 0 then
 
     if extension_cellphone ~= nil then
         if caller_id_number:sub(-10) == extension_cellphone:sub(-10) then
+
+            if conference_id > 0 then --conference call
+                session:execute("conference", "conf_"..conference_id.."@default")
+                session:hangup();
+            end
+
             local bridge_number = ""
             local bridge_id = 0
             sql = "select id, didnumber, target_number from fs_bridge_call where right(didnumber,10)=right('"..destination_number.."', 10) "
@@ -389,17 +404,22 @@ if extension_id > 0 then
     session:execute("set","RECORD_STEREO=true");
     session:execute("set","api_on_answer=uuid_record "..call_uuid.." start "..recording_file)
 
-    -- origination_param = "{phoneai_direction=inbound,phoneai_source_number"..caller_id_number.."}"
-    if extension_cellphone ~= "" then
-        session:execute("set", "effective_caller_id_name=${outbound_caller_id_name}")
-        session:execute("set", "effective_caller_id_number=${outbound_caller_id_number}")
-        session:execute("set", "hangup_after_bridge=true")
-        session:execute("set", "ignore_display_updates=true")
-        session:execute("bridge", "sofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*"..extension_cellphone)
-    else
-        session:execute("bridge", "user/"..sip_username.."@"..sip_domain)
+    if conference_id > 0 then --conference call
+        session:execute("conference", "conf_"..conference_id.."@default+"..conference_pin)
+        session:hangup();
     end
-
+    -- origination_param = "{phoneai_direction=inbound,phoneai_source_number"..caller_id_number.."}"
+    if session:ready() then
+        if extension_cellphone ~= "" then
+            session:execute("set", "effective_caller_id_name=${outbound_caller_id_name}")
+            session:execute("set", "effective_caller_id_number=${outbound_caller_id_number}")
+            session:execute("set", "hangup_after_bridge=true")
+            session:execute("set", "ignore_display_updates=true")
+            session:execute("bridge", "sofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*"..extension_cellphone)
+        else
+            session:execute("bridge", "user/"..sip_username.."@"..sip_domain)
+        end
+    end
 end
 
 session:hangup()

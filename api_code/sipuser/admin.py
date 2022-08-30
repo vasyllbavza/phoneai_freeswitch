@@ -9,6 +9,7 @@ from sipuser.models import (
     FsDidNumber,
     FsUser,
     BridgeCall,
+    ConferenceCenter,
 )
 
 
@@ -112,3 +113,12 @@ class BridgeCallAdmin(admin.ModelAdmin):
 
 
 admin.site.register(BridgeCall, BridgeCallAdmin)
+
+
+class ConferenceCenterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'didnumber', 'pin', 'active', 'created_at', 'updated_at')
+
+    search_fields = ['didnumber', 'pin']
+
+
+admin.site.register(ConferenceCenter, ConferenceCenterAdmin)
