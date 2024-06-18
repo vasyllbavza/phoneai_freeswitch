@@ -1,0 +1,36 @@
+2022-02-06 11:07:48 INFO   call-retry: starting...
+2022-02-06 11:07:48 INFO   call-retry: finishing..
+2022-02-06 11:08:04 INFO   call-retry: starting...
+2022-02-06 11:08:04 INFO   looking for this # 13013019105
+2022-02-06 11:08:04 INFO   this number is completed crawling. ignoring this.
+2022-02-06 11:08:04 INFO   call-retry: finishing..
+2022-02-06 12:29:59 INFO   call-retry: starting...
+2022-02-06 12:29:59 INFO   looking for this # 13013019105
+2022-02-06 12:29:59 INFO   this # 13013019105 is call-in-progress. ignoring this.
+2022-02-06 12:29:59 INFO   call-retry: finishing..
+2022-02-06 12:30:02 INFO   call-retry: starting...
+2022-02-06 12:30:02 INFO   looking for this # 13013019105
+2022-02-06 12:30:02 INFO   this # 13013019105 is call-in-progress. ignoring this.
+2022-02-06 12:30:02 INFO   call-retry: finishing..
+2022-02-06 12:30:18 INFO   call-retry: starting...
+2022-02-06 12:30:18 INFO   looking for this # 13013019105
+2022-02-06 12:30:18 INFO   bgapi originate {is_new_call=0,phoneai_number_id=14,phoneai_call_id=53,call_menu_id=160,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=13013019105,origination_uuid=7fe4aba8-5702-41a9-af89-cc9da3c10103}sofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*13013019105 &lua(phoneai.lua)
+2022-02-06 12:30:18 INFO   call-retry: finishing..
+2022-02-06 12:30:23 INFO   call-retry: starting...
+2022-02-06 12:30:23 INFO   looking for this # 13013019105
+2022-02-06 12:30:23 INFO   this # 13013019105 is call-in-progress. ignoring this.
+2022-02-06 12:30:23 INFO   call-retry: finishing..
+2022-02-06 12:42:25 INFO   call-retry: starting...
+2022-02-06 12:42:25 INFO   looking for this # 13013019105
+2022-02-06 12:42:25 INFO   bgapi originate {is_new_call=0,phoneai_number_id=14,phoneai_call_id=53,call_menu_id=160,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=13013019105,origination_uuid=460f83fd-2b05-401a-a86d-70c6a270b667}sofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*13013019105 &lua(phoneai.lua)
+2022-02-06 12:42:25 INFO   call-retry: finishing..
+2022-02-06 12:43:09 INFO   call-retry: starting...
+2022-02-06 12:43:09 INFO   looking for this # 13013019105
+2022-02-06 12:43:09 INFO   bgapi originate {is_new_call=0,phoneai_number_id=14,phoneai_call_id=53,call_menu_id=161,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=13013019105,origination_uuid=8f1aae24-1104-404e-8ed0-53dbc3579eb7}sofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*13013019105 &lua(phoneai.lua)
+2022-02-06 12:43:09 INFO   call-retry: finishing..
+2022-02-06 12:43:59 INFO   call-retry: starting...
+2022-02-06 12:43:59 INFO   looking for this # 13013019105
+2022-02-06 12:43:59 INFO   bgapi originate {is_new_call=0,phoneai_number_id=14,phoneai_call_id=53,call_menu_id=161,ignore_early_media=true,origination_caller_id_name=phoneAI,origination_caller_id_number=13013019105,origination_uuid=04a20220-6da1-4a2c-a039-d59a19c9a6f2}sofia/gateway/58e29eb4-bc1e-4c3d-bf30-25ff961b1b99/69485048*13013019105 &lua(phoneai.lua)
+2022-02-06 12:43:59 INFO   call-retry: finishing..
+2022-02-06 12:45:05 INFO   call-retry: starting...
+2022-02-06 12:45:05 INFO   call-retry: finishing..

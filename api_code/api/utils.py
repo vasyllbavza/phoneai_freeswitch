@@ -1,4 +1,5 @@
 import json
+import os
 from flowroutenumbersandmessaging.flowroutenumbersandmessaging_client import FlowroutenumbersandmessagingClient
 import requests
 
@@ -31,10 +32,12 @@ class TreeNode(dict):
 
 def send_sms(to_number, sms_text, sms_from=None):
 
-    basic_auth_user_name = "06b93c4e"
-    basic_auth_password = "947410ae2da44b59867c564cbbc7c0c3"
+#    basic_auth_user_name = "06b93c4e"
+#    basic_auth_password = "947410ae2da44b59867c564cbbc7c0c3"
+    basic_auth_user_name = "97ad3198"
+    basic_auth_password = "be93ca170de142948110ca468a172291"
     mobile_number = "17866648610"
-    from_number = "14582037530"
+    from_number = os.getenv("PHONEAI_CALLER_ID")
     if sms_from:
         from_number = sms_from
 
@@ -54,6 +57,7 @@ def send_sms(to_number, sms_text, sms_from=None):
     request_body = json.dumps(req)
     print(request_body)
     result = messages_controller.send_a_message(request_body)
+    print(result)
     return result
 
 def post_webhook(url, data):

@@ -1,4 +1,5 @@
 import uuid
+import os
 
 from django.shortcuts import render
 from api.models import CallKey, CallMenu
@@ -103,7 +104,7 @@ class MakeCallView(APIView):
         content = {}
 
         dial_number = request.query_params.get('number','')
-        caller_id = request.query_params.get('caller_id','14582037530')
+        caller_id = request.query_params.get('caller_id',os.getenv("PHONEAI_CALLER_ID"))
         is_new_call = request.query_params.get('new','1')
         business_name = request.query_params.get('business_name','')
 
@@ -308,7 +309,7 @@ class MakeRetryCallSubMenuView(APIView):
             content['fs_output'] = ""
             return Response(content)
 
-        caller_id = '14582037530'
+        caller_id = os.getenv("PHONEAI_CALLER_ID")
         number = menu.call.number
         dial_number = number.number
         call_id = menu.call.id
@@ -370,7 +371,7 @@ class MakeCallSubMenuView(APIView):
         #     content['fs_output'] = ""
         #     return Response(content)
 
-        caller_id = '14582037530'
+        caller_id = os.getenv("PHONEAI_CALLER_ID")
         number = menu.call.number
         dial_number = number.number
         call_id = menu.call.id
@@ -441,7 +442,9 @@ class SendSMSView(APIView):
                 content["status"] = "ok"
                 content["result"] = str(result)
                 return Response(smsdata.data, status=status.HTTP_201_CREATED)
-            except:
+            except Exception as e:
+                logger.exception("Failed to send SMS")
+                logger.error(f"Failed to send SMS: {e}")
                 content = {}
                 content["status"] = "failed"
                 return Response(content, status=status.HTTP_400_BAD_REQUEST)
@@ -469,7 +472,7 @@ class SMSDLRView(APIView):
 # {
 #     attributes: {
 #         to: 17866648610,
-#         from: 14582037530,
+#         from: 13013019105,
 #         body: hello there test test 123467,
 #         status: message buffered,
 #         status_code: 1003
@@ -477,7 +480,7 @@ class SMSDLRView(APIView):
 #     id: mdr2-04de8f38c6ee42c7bfd784850277d576,
 #     type: delivery_receipt
 # }
-# {\x22attributes\x22: {\x22to\x22: \x2217866648610\x22, \x22from\x22: \x2214582037530\x22, \x22body\x22: \x22hello there test test 123467\x22, \x22status\x22: \x22smsc submit\x22}, \x22id\x22: \x22mdr2-d616911548734333b3359d8a9b7eef0c\x22, \x22type\x22: \x22delivery_receipt\x22}
+# {\x22attributes\x22: {\x22to\x22: \x2217866648610\x22, \x22from\x22: \x2213013019105\x22, \x22body\x22: \x22hello there test test 123467\x22, \x22status\x22: \x22smsc submit\x22}, \x22id\x22: \x22mdr2-d616911548734333b3359d8a9b7eef0c\x22, \x22type\x22: \x22delivery_receipt\x22}
 
     def post(self,request,format=None):
 
@@ -501,7 +504,7 @@ class SMSDLRView(APIView):
 class IncomingSMSView(APIView):
 # {
 #     body: Hello,
-#     to: 14582037530,
+#     to: 13013019105,
 #     from: 17866648610,
 #     id: mdr2-e37cd30f131440278d1048ac6b387b0b
 # }
